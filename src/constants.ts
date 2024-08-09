@@ -10,3 +10,5 @@ export enum Actions {
   GET_PROCESSED_TRANSACTION = 'get_processed_transaction',
   GET_ACCOUNT_ADDRESS = 'get_account_address',
 }
+
+export const RUNTIME_TX_SIZE_LIMIT = 1024; /** usize */
