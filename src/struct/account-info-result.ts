@@ -1,4 +1,4 @@
-import { Schema } from 'borsh';
+import { Schema, serialize } from 'borsh';
 import { Pubkey } from './pubkey';
 import { UtxoMeta } from './utxo';
 
@@ -28,4 +28,8 @@ export class AccountInfoResult {
       owner: { option: Pubkey.Schema },
     },
   };
+
+  serialize() {
+    return serialize(AccountInfoResult.Schema, this);
+  }
 }

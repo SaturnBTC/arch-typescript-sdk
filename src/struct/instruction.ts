@@ -37,6 +37,14 @@ export class Instruction {
 
     return hash2;
   }
+
+  toJSON() {
+    return {
+      programId: this.programId.toJSON(),
+      accounts: this.accounts.map(AccountMeta.prototype.toJSON),
+      data: Array.from(this.data),
+    };
+  }
 }
 
 export class CreateAccount {
@@ -77,7 +85,7 @@ export class SystemInstruction {
   ) {
     return new Instruction(
       Pubkey.systemProgram(),
-      [{ pubkey, is_signer: true, is_writable: true }],
+      [AccountMeta.from({ pubkey, is_signer: true, is_writable: true })],
       new CreateAccount(txid, vout, pubkey).serialize(),
     );
   }
@@ -91,7 +99,7 @@ export class SystemInstruction {
   static newExtendBytesInstruction(data: Uint8Array, pubkey: Pubkey) {
     return new Instruction(
       Pubkey.systemProgram(),
-      [{ pubkey, is_signer: true, is_writable: true }],
+      [AccountMeta.from({ pubkey, is_signer: true, is_writable: true })],
       serialize({ array: { type: 'u8' } }, data),
     );
   }

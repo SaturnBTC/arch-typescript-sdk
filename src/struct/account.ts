@@ -1,4 +1,4 @@
-import { Schema } from 'borsh';
+import { Schema, serialize } from 'borsh';
 import { Pubkey } from './pubkey';
 import { UtxoMeta } from './utxo';
 
@@ -32,6 +32,18 @@ export class AccountMeta {
     public is_writable: boolean,
   ) {}
 
+  static from({
+    pubkey,
+    is_signer,
+    is_writable,
+  }: {
+    pubkey: Pubkey;
+    is_signer: boolean;
+    is_writable: boolean;
+  }) {
+    return new AccountMeta(pubkey, is_signer, is_writable);
+  }
+
   static Schema: Schema = {
     struct: {
       pubkey: Pubkey.Schema,
@@ -39,4 +51,16 @@ export class AccountMeta {
       is_writable: 'bool',
     },
   };
+
+  serialize() {
+    return serialize(AccountMeta.Schema, this);
+  }
+
+  toJSON() {
+    return {
+      pubkey: this.pubkey.toJSON(),
+      is_signer: this.is_signer,
+      is_writable: this.is_writable,
+    };
+  }
 }

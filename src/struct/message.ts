@@ -35,4 +35,11 @@ export class Message {
 
     return hash2;
   }
+
+  toJSON() {
+    return {
+      signers: this.signers.map((pubkey) => pubkey.toJSON()),
+      instructions: this.instructions.map((ix) => ix.toJSON()),
+    };
+  }
 }

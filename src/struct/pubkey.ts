@@ -53,4 +53,8 @@ export class Pubkey {
   toString(): string {
     return this.toHex();
   }
+
+  toJSON() {
+    return Array.from(this.data);
+  }
 }

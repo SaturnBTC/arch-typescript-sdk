@@ -24,6 +24,14 @@ export class RuntimeTransaction {
     return serialize(RuntimeTransaction.Schema, this);
   }
 
+  toJSON() {
+    return {
+      version: this.version,
+      signatures: this.signatures.map(Signature.prototype.toJSON),
+      message: this.message.toJSON(),
+    };
+  }
+
   fromBuffer(buffer: Uint8Array) {
     const deserialized = deserialize(RuntimeTransaction.Schema, buffer);
     if (!deserialized) throw Error("runtime tx couldn't be deserialized");
