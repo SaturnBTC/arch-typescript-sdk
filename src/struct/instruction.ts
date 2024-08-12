@@ -41,7 +41,7 @@ export class Instruction {
   toJSON() {
     return {
       programId: this.programId.toJSON(),
-      accounts: this.accounts.map(AccountMeta.prototype.toJSON),
+      accounts: this.accounts.map((accountMeta) => accountMeta.toJSON()),
       data: Array.from(this.data),
     };
   }
