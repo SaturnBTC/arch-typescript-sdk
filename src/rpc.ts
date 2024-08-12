@@ -1,6 +1,6 @@
 import { Action } from './constants';
 import { Pubkey } from './struct/pubkey';
-import { post, postData, processResult } from './utils';
+import { postData, processResult } from './utils';
 
 export class RpcConnection {
   nodeUrl: string;
@@ -10,7 +10,7 @@ export class RpcConnection {
   }
 
   async startKeyExchange() {
-    const result = await post(this.nodeUrl, Action.START_KEY_EXCHANGE);
+    const result = await postData(this.nodeUrl, Action.START_KEY_EXCHANGE);
 
     return processResult(result);
   }
@@ -44,7 +44,10 @@ export class RpcConnection {
   }
 
   async getBestBlock(): Promise<string> {
-    const bestBlockHash = await post(this.nodeUrl, Action.GET_BEST_BLOCK_HASH);
+    const bestBlockHash = await postData(
+      this.nodeUrl,
+      Action.GET_BEST_BLOCK_HASH,
+    );
 
     return postData(this.nodeUrl, Action.GET_BLOCK, bestBlockHash);
   }

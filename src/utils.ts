@@ -7,47 +7,26 @@ export interface JsonRpcPayload<T> {
   params?: T;
 }
 
-export async function post(url: string, method: string): Promise<string> {
-  const payload = {
-    jsonrpc: '2.0',
-    id: 'curlycurl',
-    method,
-  };
-
-  try {
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
-
-    if (!response.ok) {
-      throw Error(await response.text());
-    }
-
-    return response.text();
-  } catch (err) {
-    throw Error('rpc post should not fail');
-  }
-}
-
 export async function postData<T>(
   url: string,
   method: string,
-  params: T,
+  params?: T,
 ): Promise<string> {
   const payload: JsonRpcPayload<T> = {
     jsonrpc: '2.0',
     id: 'curlycurl',
     method: method,
-    params: params,
   };
+
+  if (params) {
+    payload.params = params;
+  }
 
   let serializedPayload;
   try {
     serializedPayload = JSON.stringify(payload);
   } catch (err) {
-    throw Error('Params must be serializable', { cause: err });
+    throw Error('payload must be serializable', { cause: err });
   }
 
   try {
