@@ -1,5 +1,10 @@
 export { RpcConnection } from './rpc';
 export { Action } from './constants';
-export { AccountInfoResult } from './sdk/account-info-result';
-export { Pubkey } from './sdk/pubkey';
-export { UtxoInfo, UtxoMeta } from './sdk/utxo';
+export { AccountInfoResult } from './struct/account-info-result';
+export { AccountInfo, AccountMeta } from './struct/account';
+export { Instruction } from './struct/instruction';
+export { Message } from './struct/message';
+export { Pubkey } from './struct/pubkey';
+export { RuntimeTransaction } from './struct/runtime-transaction';
+export { Signature } from './struct/signature';
+export { UtxoInfo, UtxoMeta } from './struct/utxo';

@@ -1,5 +1,5 @@
 import { Action } from './constants';
-import { Pubkey } from './sdk/pubkey';
+import { Pubkey } from './struct/pubkey';
 import { post, postData, processResult } from './utils';
 
 export class RpcConnection {
