@@ -1,5 +1,6 @@
 import { Action } from './constants';
 import { Pubkey } from './struct/pubkey';
+import { RuntimeTransaction } from './struct/runtime-transaction';
 import { postData, processResult } from './utils';
 
 export class RpcConnection {
@@ -15,8 +16,9 @@ export class RpcConnection {
     return processResult(result);
   }
 
-  async sendTransaction(transactionParams: any) {
-    return postData(this.nodeUrl, Action.SEND_TRANSACTION, transactionParams);
+  async sendTransaction(params: RuntimeTransaction) {
+    // RuntimeTransaction must be JSON serializable, according to the Rust code
+    return postData(this.nodeUrl, Action.SEND_TRANSACTION, params.toJSON());
   }
 
   async readAccountInfo(pubkey: Pubkey) {
