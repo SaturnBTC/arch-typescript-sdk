@@ -1,4 +1,4 @@
-import { Actions } from './constants';
+import { Action } from './constants';
 import { Pubkey } from './sdk/pubkey';
 import { post, postData, processResult } from './utils';
 
@@ -10,18 +10,18 @@ export class RpcConnection {
   }
 
   async startKeyExchange() {
-    const result = await post(this.nodeUrl, Actions.START_KEY_EXCHANGE);
+    const result = await post(this.nodeUrl, Action.START_KEY_EXCHANGE);
 
     return processResult(result);
   }
 
   async sendTransaction(transactionParams: any) {
-    return postData(this.nodeUrl, Actions.SEND_TRANSACTION, transactionParams);
+    return postData(this.nodeUrl, Action.SEND_TRANSACTION, transactionParams);
   }
 
   async readAccountInfo(pubkey: Pubkey) {
     const result = processResult(
-      await postData(this.nodeUrl, Actions.READ_ACCOUNT_INFO, pubkey),
+      await postData(this.nodeUrl, Action.READ_ACCOUNT_INFO, pubkey),
     );
 
     return result;
@@ -30,7 +30,7 @@ export class RpcConnection {
   async getAccountAddress(pubkey: Pubkey): Promise<string> {
     const result = await postData(
       this.nodeUrl,
-      Actions.GET_ACCOUNT_ADDRESS,
+      Action.GET_ACCOUNT_ADDRESS,
       pubkey,
     );
 
@@ -38,18 +38,18 @@ export class RpcConnection {
   }
 
   async getProgram(programId: string) {
-    const result = await postData(this.nodeUrl, Actions.GET_PROGRAM, programId);
+    const result = await postData(this.nodeUrl, Action.GET_PROGRAM, programId);
 
     return processResult(result);
   }
 
   async getBestBlock(): Promise<string> {
-    const bestBlockHash = await post(this.nodeUrl, Actions.GET_BEST_BLOCK_HASH);
+    const bestBlockHash = await post(this.nodeUrl, Action.GET_BEST_BLOCK_HASH);
 
-    return postData(this.nodeUrl, Actions.GET_BLOCK, bestBlockHash);
+    return postData(this.nodeUrl, Action.GET_BLOCK, bestBlockHash);
   }
 
   async getProcessedTx(txid: string) {
-    return postData(this.nodeUrl, Actions.GET_PROCESSED_TRANSACTION, txid);
+    return postData(this.nodeUrl, Action.GET_PROCESSED_TRANSACTION, txid);
   }
 }

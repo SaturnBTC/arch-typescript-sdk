@@ -1,4 +1,4 @@
-export enum Actions {
+export enum Action {
   START_KEY_EXCHANGE = 'start_key_exchange',
   ASSIGN_AUTHORITY = 'assign_authority',
   READ_ACCOUNT_INFO = 'read_account_info',
