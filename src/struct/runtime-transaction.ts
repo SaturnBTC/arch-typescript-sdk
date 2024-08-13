@@ -27,7 +27,7 @@ export class RuntimeTransaction {
   toJSON() {
     return {
       version: this.version,
-      signatures: this.signatures.map(Signature.prototype.toJSON),
+      signatures: this.signatures.map((s) => s.toJSON()),
       message: this.message.toJSON(),
     };
   }
