@@ -5,14 +5,14 @@ import { createHash } from 'crypto';
 
 export class Instruction {
   constructor(
-    public programId: Pubkey,
+    public program_id: Pubkey,
     public accounts: Array<AccountMeta>,
     public data: Uint8Array,
   ) {}
 
   static Schema: Schema = {
     struct: {
-      programId: Pubkey.Schema,
+      program_id: Pubkey.Schema,
       accounts: {
         array: {
           type: AccountMeta.Schema,
@@ -40,7 +40,7 @@ export class Instruction {
 
   toJSON() {
     return {
-      programId: this.programId.toJSON(),
+      program_id: this.program_id.toJSON(),
       accounts: this.accounts.map((accountMeta) => accountMeta.toJSON()),
       data: Array.from(this.data),
     };

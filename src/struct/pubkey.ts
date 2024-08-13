@@ -1,6 +1,5 @@
-import { serialize, deserialize, Schema } from 'borsh';
+import { Schema } from 'borsh';
 import { Buffer } from 'buffer';
-import { createHash } from 'crypto';
 
 export class Pubkey {
   private data: Uint8Array;
@@ -56,5 +55,15 @@ export class Pubkey {
 
   toJSON() {
     return Array.from(this.data);
+  }
+
+  equals(key: Pubkey) {
+    for (let i = 0; i < 32; i++) {
+      if (this.data[i] !== key.data[i]) {
+        return false;
+      }
+    }
+
+    return true;
   }
 }
