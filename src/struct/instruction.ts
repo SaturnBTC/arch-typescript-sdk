@@ -100,7 +100,7 @@ export class SystemInstruction {
     return new Instruction(
       Pubkey.systemProgram(),
       [AccountMeta.from({ pubkey, is_signer: true, is_writable: true })],
-      serialize({ array: { type: 'u8' } }, data),
+      data, // should borsh be used here?
     );
   }
 }
