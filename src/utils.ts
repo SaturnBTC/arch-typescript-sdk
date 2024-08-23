@@ -45,7 +45,7 @@ export async function postData<T>(
   }
 }
 
-export function processResult(response: string): Value {
+export function processResult<T>(response: string): T {
   try {
     const result: Value = JSON.parse(response);
 
@@ -57,7 +57,7 @@ export function processResult(response: string): Value {
       throw new Error(JSON.stringify(result.error));
     }
 
-    return result.result;
+    return result.result as T;
   } catch (error: any) {
     throw new Error(
       `Processing result failed: ${'message' in error ? error.message : 'unknown'}`,

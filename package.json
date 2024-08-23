@@ -30,7 +30,5 @@
     "insertPragma": false,
     "endOfLine": "lf"
   },
-  "dependencies": {
-    "borsh": "^2.0.0"
-  }
+  "dependencies": {}
 }
