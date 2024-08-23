@@ -1,5 +1,5 @@
 {
-  "name": "arch-network-js",
+  "name": "@saturn/arch-network-sdk",
   "version": "0.0.1",
   "main": "index.js",
   "type": "module",
