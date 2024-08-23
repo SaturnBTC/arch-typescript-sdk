@@ -102,24 +102,6 @@ export class RpcConnection {
     }
   }
 
-  async getBlockCount() {
-    const result = await postData(this.nodeUrl, Action.GET_BLOCK_COUNT);
-
-    return processResult(result);
-  }
-
-  async getBlockHash() {
-    const result = await postData(this.nodeUrl, Action.GET_BLOCK_HASH);
-
-    return processResult(result);
-  }
-
-  async getBlock(hash: string) {
-    const result = await postData(this.nodeUrl, Action.GET_BLOCK, hash);
-
-    return processResult(result);
-  }
-
   async getAccountInfo(address: string) {
     const result = await postData(
       this.nodeUrl,
