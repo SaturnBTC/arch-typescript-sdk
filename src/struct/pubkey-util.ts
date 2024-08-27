@@ -16,4 +16,3 @@ export const fromHex = (hex: string) => {
 export const isSystemProgram = (pubkey: Pubkey) => {
   return pubkey === systemProgram();
 };
-

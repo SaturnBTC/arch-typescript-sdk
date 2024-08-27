@@ -6,8 +6,8 @@ export enum Status {
 }
 
 export interface ProcessedTransaction {
-  runtimeTransaction: RuntimeTransaction;
+  runtime_transaction: RuntimeTransaction;
   status: Status;
-  bitcoinTxids: string[];
+  bitcoin_txids: string[];
 }
 
