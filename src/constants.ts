@@ -5,6 +5,7 @@ export enum Action {
   READ_ACCOUNT_INFO = 'read_account_info',
   // DEPLOY_PROGRAM = 'deploy_program',
   SEND_TRANSACTION = 'send_transaction',
+  SEND_TRANSACTIONS = 'send_transactions',
   GET_PROGRAM = 'get_program',
   GET_BLOCK = 'get_block',
   GET_BLOCK_COUNT = 'get_block_count',

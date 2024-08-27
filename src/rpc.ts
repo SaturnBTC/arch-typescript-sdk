@@ -19,6 +19,10 @@ export class RpcConnection {
     return postData(this.nodeUrl, Action.SEND_TRANSACTION, params);
   }
 
+  async sendTransactions(params: Array<RuntimeTransaction>) {
+    return postData(this.nodeUrl, Action.SEND_TRANSACTIONS, params);
+  }
+
   async readAccountInfo(pubkey: Pubkey) {
     const result = processResult<AccountInfoResult>(
       await postData(this.nodeUrl, Action.READ_ACCOUNT_INFO, pubkey),
