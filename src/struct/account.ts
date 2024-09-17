@@ -1,4 +1,5 @@
-import { Pubkey } from './pubkey';
+import { Schema } from 'borsh';
+import { Pubkey, PubkeySchema } from './pubkey';
 import { UtxoMeta } from './utxo';
 
 export interface AccountInfo {
@@ -21,3 +22,11 @@ export interface AccountInfoResult {
   utxo: string;
   is_executable: boolean;
 }
+
+export const AccountMetaSchema: Schema = {
+  struct: {
+    pubkey: PubkeySchema,
+    is_signer: 'bool',
+    is_writable: 'bool',
+  },
+};

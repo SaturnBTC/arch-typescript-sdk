@@ -1,4 +1,4 @@
-import { Pubkey } from "./pubkey";
+import { Pubkey } from "../struct/pubkey";
 
 export const systemProgram = () => {
   const tmp = new Uint8Array(32);
