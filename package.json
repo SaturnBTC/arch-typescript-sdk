@@ -1,8 +1,26 @@
 {
-  "name": "@saturn/arch-sdk",
+  "name": "@saturnbtcio/arch-sdk",
   "version": "0.0.1",
-  "main": "index.js",
+  "description": "Arch SDK",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "type": "module",
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SaturnBTC/arch-typescript-sdk.git"
+  },
+  "bugs": {
+    "url": "https://github.com/SaturnBTC/arch-typescript-sdk/issues"
+  },
+  "homepage": "https://github.com/SaturnBTC/arch-typescript-sdk#readme",
+  "keywords": [
+    "saturn",
+    "arch",
+    "sdk"
+  ],
   "scripts": {
     "build": "tsup src/index.ts --format cjs,esm --dts",
     "lint": "tsc",
@@ -30,5 +48,9 @@
     "insertPragma": false,
     "endOfLine": "lf"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@noble/hashes": "^1.4.0",
+    "@scure/base": "^1.1.7",
+    "borsh": "^2.0.0"
+  }
 }
