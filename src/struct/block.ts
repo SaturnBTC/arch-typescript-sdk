@@ -1,4 +1,4 @@
 export interface Block {
-    transactions: Array<string>;
-    previous_block_hash: string;
+  transactions: Array<string>;
+  previous_block_hash: string;
 }
