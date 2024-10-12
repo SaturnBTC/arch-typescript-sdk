@@ -6,7 +6,6 @@ export enum Action {
   // DEPLOY_PROGRAM = 'deploy_program',
   SEND_TRANSACTION = 'send_transaction',
   SEND_TRANSACTIONS = 'send_transactions',
-  GET_PROGRAM = 'get_program',
   GET_BLOCK = 'get_block',
   GET_BLOCK_COUNT = 'get_block_count',
   GET_BLOCK_HASH = 'get_block_hash',

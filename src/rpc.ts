@@ -1,10 +1,12 @@
+import { hex } from '@scure/base';
 import { Action } from './constants';
-import { AccountInfoResult } from './struct/account';
+import { AccountInfoResult, CreatedAccount } from './struct/account';
 import { Block } from './struct/block';
 import { ProcessedTransaction } from './struct/processed-transaction';
 import { Pubkey } from './struct/pubkey';
 import { RuntimeTransaction } from './struct/runtime-transaction';
 import { postData, processResult } from './utils';
+import { secp256k1 } from '@noble/curves/secp256k1';
 
 const NOT_FOUND = 404;
 
@@ -41,12 +43,25 @@ export class RpcConnection {
     return processResult<string>(result);
   }
 
-  async getProgram(programId: string) {
-    const result = await postData(this.nodeUrl, Action.GET_PROGRAM, programId);
-
-    return processResult<string>(result);
+  /**
+   * Creates a new account.
+   * @returns A promise that resolves with the created account.
+   */
+  async createNewAccount(): Promise<CreatedAccount> {
+    const newShardPrivKey = secp256k1.utils.randomPrivateKey();
+    const newShardPubkey = secp256k1.getPublicKey(newShardPrivKey);
+    const address = await this.getAccountAddress(newShardPubkey);
+    return {
+      privkey: hex.encode(newShardPrivKey),
+      pubkey: hex.encode(newShardPubkey),
+      address,
+    };
   }
 
+  /**
+   * Gets the best block hash.
+   * @returns A promise that resolves with the best block hash.
+   */
   async getBestBlockHash(): Promise<string> {
     const bestBlockHash = await postData(
       this.nodeUrl,

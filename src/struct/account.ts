@@ -30,3 +30,9 @@ export const AccountMetaSchema: Schema = {
     is_writable: 'bool',
   },
 };
+
+export interface CreatedAccount {
+  privkey: string;
+  pubkey: string;
+  address: string;
+}

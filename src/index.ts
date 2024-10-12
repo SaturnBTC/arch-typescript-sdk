@@ -4,6 +4,7 @@ export type {
   AccountInfo,
   AccountMeta,
   AccountInfoResult,
+  CreatedAccount,
 } from './struct/account';
 export type { Instruction } from './struct/instruction';
 export { InstructionSchema } from './struct/instruction';
