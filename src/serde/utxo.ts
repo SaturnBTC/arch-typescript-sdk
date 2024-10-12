@@ -1,4 +1,4 @@
-import { UtxoMeta } from '../struct/utxo';
+import { UtxoMeta, UtxoMetaData } from '../struct/utxo';
 import { hex } from '@scure/base';
 
 export const fromBytes = (txid: Uint8Array, vout: number): UtxoMeta => {
@@ -17,7 +17,7 @@ export const fromHex = (txid: string, vout: number): UtxoMeta => {
   return fromBytes(txidBytes, vout);
 };
 
-export const toString = (utxo: UtxoMeta) => {
+export const toString = (utxo: UtxoMeta): UtxoMetaData => {
   const txid = hex.encode(utxo.slice(0, 32));
   const vout = new DataView(utxo.buffer).getUint32(32, true);
   return {
