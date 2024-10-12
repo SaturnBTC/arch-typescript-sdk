@@ -12,7 +12,7 @@ export enum Action {
   GET_BEST_BLOCK_HASH = 'get_best_block_hash',
   GET_PROCESSED_TRANSACTION = 'get_processed_transaction',
   GET_ACCOUNT_ADDRESS = 'get_account_address',
-  GET_ACCOUNT_INFO = 'get_account_info',
+  GET_PROGRAM_ACCOUNTS = 'get_program_accounts',
 }
 
 export const RUNTIME_TX_SIZE_LIMIT = 1024; /** usize */

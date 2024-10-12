@@ -5,6 +5,7 @@ import { Block } from './struct/block';
 import { ProcessedTransaction } from './struct/processed-transaction';
 import { Pubkey } from './struct/pubkey';
 import { RuntimeTransaction } from './struct/runtime-transaction';
+import { ProgramAccount, AccountFilter } from './struct/program-account';
 import { postData, processResult } from './utils';
 import { secp256k1 } from '@noble/curves/secp256k1';
 import {
@@ -179,13 +180,22 @@ export class RpcConnection {
     }
   }
 
-  async getAccountInfo(address: string) {
-    const result = await postData(
-      this.nodeUrl,
-      Action.GET_ACCOUNT_INFO,
-      address,
-    );
+  /**
+   * Gets the program accounts for a given program ID.
+   * @param programId The program ID to fetch accounts for.
+   * @param filters Optional filters to apply when fetching accounts.
+   * @returns A promise that resolves with an array of program accounts.
+   */
+  async getProgramAccounts(
+    programId: Pubkey,
+    filters?: AccountFilter[],
+  ): Promise<ProgramAccount[]> {
+    const result = await postData(this.nodeUrl, Action.GET_PROGRAM_ACCOUNTS, [
+      serializeWithUint8Array(programId),
+      filters,
+    ]);
 
-    return processResult(result);
+    const response = processResult<SerializeUint8Array<ProgramAccount[]>>(result);
+    return deserializeWithUint8Array<ProgramAccount[]>(response);
   }
 }
