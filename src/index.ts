@@ -24,4 +24,3 @@ export type {
   ProcessedTransaction,
   Status,
 } from './struct/processed-transaction';
-export * as TransactionUtils from './transaction/utils';
