@@ -1,4 +1,6 @@
-export { RpcConnection } from './rpc';
+export { RpcConnection } from './provider/rpc';
+export { Maestro } from './provider/maestro';
+export { Arch } from './arch';
 export { Action } from './constants';
 export type {
   AccountInfo,

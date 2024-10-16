@@ -1,22 +1,22 @@
-import { hex } from '@scure/base';
-import { Action } from './constants';
-import { AccountInfoResult, CreatedAccount } from './struct/account';
-import { Block } from './struct/block';
-import { ProcessedTransaction } from './struct/processed-transaction';
-import { Pubkey } from './struct/pubkey';
-import { RuntimeTransaction } from './struct/runtime-transaction';
-import { ProgramAccount, AccountFilter } from './struct/program-account';
-import { postData, processResult } from './utils';
-import { secp256k1 } from '@noble/curves/secp256k1';
+import { Action } from '../constants';
+import { AccountInfoResult } from '../struct/account';
+import { Block } from '../struct/block';
+import { ProcessedTransaction } from '../struct/processed-transaction';
+import { Pubkey } from '../struct/pubkey';
+import { RuntimeTransaction } from '../struct/runtime-transaction';
+import { ProgramAccount, AccountFilter } from '../struct/program-account';
+import { postData, processResult } from '../utils';
+
 import {
   deserializeWithUint8Array,
   SerializeUint8Array,
   serializeWithUint8Array,
-} from './serde/uint8array';
+} from '../serde/uint8array';
+import { Provider } from './provider';
 
 const NOT_FOUND = 404;
 
-export class RpcConnection {
+export class RpcConnection implements Provider {
   nodeUrl: string;
 
   constructor(nodeUrl: string) {
@@ -29,10 +29,12 @@ export class RpcConnection {
    * @returns A promise that resolves with the transaction result.
    */
   async sendTransaction(params: RuntimeTransaction) {
-    return postData(
-      this.nodeUrl,
-      Action.SEND_TRANSACTION,
-      serializeWithUint8Array(params),
+    return processResult<string>(
+      await postData(
+        this.nodeUrl,
+        Action.SEND_TRANSACTION,
+        serializeWithUint8Array(params),
+      ),
     );
   }
 
@@ -42,10 +44,12 @@ export class RpcConnection {
    * @returns A promise that resolves with the transaction results.
    */
   async sendTransactions(params: Array<RuntimeTransaction>) {
-    return postData(
-      this.nodeUrl,
-      Action.SEND_TRANSACTIONS,
-      params.map((tx) => serializeWithUint8Array(tx)),
+    return processResult<string[]>(
+      await postData(
+        this.nodeUrl,
+        Action.SEND_TRANSACTIONS,
+        params.map((tx) => serializeWithUint8Array(tx)),
+      ),
     );
   }
 
@@ -79,21 +83,6 @@ export class RpcConnection {
     );
 
     return processResult<string>(result);
-  }
-
-  /**
-   * Creates a new account.
-   * @returns A promise that resolves with the created account.
-   */
-  async createNewAccount(): Promise<CreatedAccount> {
-    const newShardPrivKey = secp256k1.utils.randomPrivateKey();
-    const newShardPubkey = secp256k1.getPublicKey(newShardPrivKey);
-    const address = await this.getAccountAddress(newShardPubkey);
-    return {
-      privkey: hex.encode(newShardPrivKey),
-      pubkey: hex.encode(newShardPubkey),
-      address,
-    };
   }
 
   /**
@@ -195,7 +184,8 @@ export class RpcConnection {
       filters,
     ]);
 
-    const response = processResult<SerializeUint8Array<ProgramAccount[]>>(result);
+    const response =
+      processResult<SerializeUint8Array<ProgramAccount[]>>(result);
     return deserializeWithUint8Array<ProgramAccount[]>(response);
   }
 }
