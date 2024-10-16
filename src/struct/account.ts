@@ -9,7 +9,9 @@ export interface AccountInfo {
   owner: Pubkey;
   is_signer: boolean;
   is_writable: boolean;
+  tag: string;
 }
+
 export interface AccountMeta {
   pubkey: Pubkey;
   is_signer: boolean;

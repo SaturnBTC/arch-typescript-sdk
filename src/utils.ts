@@ -35,6 +35,7 @@ export async function postData<T>(
       headers: { 'Content-Type': 'application/json' },
       body: serializedPayload,
     });
+
     if (!response.ok) {
       throw Error(await response.text());
     }
