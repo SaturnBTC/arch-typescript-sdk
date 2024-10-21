@@ -1,6 +1,7 @@
 export { RpcConnection } from './provider/rpc';
 export { Maestro } from './provider/maestro';
-export { Arch } from './arch';
+export type { Arch } from './arch';
+export { ArchConnection } from './arch';
 export { Action } from './constants';
 export type {
   AccountInfo,
@@ -15,7 +16,8 @@ export { MessageSchema } from './struct/message';
 export type { Pubkey } from './struct/pubkey';
 export { PubkeySchema } from './struct/pubkey';
 export type { RuntimeTransaction } from './struct/runtime-transaction';
-export type { UtxoMeta, UtxoMetaData, UtxoMetaSchema } from './struct/utxo';
+export type { UtxoMeta, UtxoMetaData } from './struct/utxo';
+export { UtxoMetaSchema } from './struct/utxo';
 export type { Block } from './struct/block';
 export * as MessageUtil from './serde/message';
 export * as PubkeyUtil from './serde/pubkey';
