@@ -9,16 +9,16 @@ export interface Arch extends Provider {
 
 export const ArchConnection = (provider: Provider): Arch => {
   return {
-    sendTransaction: provider.sendTransaction,
-    sendTransactions: provider.sendTransactions,
-    readAccountInfo: provider.readAccountInfo,
-    getAccountAddress: provider.getAccountAddress,
-    getBestBlockHash: provider.getBestBlockHash,
-    getBlock: provider.getBlock,
-    getBlockCount: provider.getBlockCount,
-    getBlockHash: provider.getBlockHash,
-    getProgramAccounts: provider.getProgramAccounts,
-    getProcessedTransaction: provider.getProcessedTransaction,
+    sendTransaction: provider.sendTransaction.bind(provider),
+    sendTransactions: provider.sendTransactions.bind(provider),
+    readAccountInfo: provider.readAccountInfo.bind(provider),
+    getAccountAddress: provider.getAccountAddress.bind(provider),
+    getBestBlockHash: provider.getBestBlockHash.bind(provider),
+    getBlock: provider.getBlock.bind(provider),
+    getBlockCount: provider.getBlockCount.bind(provider),
+    getBlockHash: provider.getBlockHash.bind(provider),
+    getProgramAccounts: provider.getProgramAccounts.bind(provider),
+    getProcessedTransaction: provider.getProcessedTransaction.bind(provider),
 
     /**
      * Creates a new account.
