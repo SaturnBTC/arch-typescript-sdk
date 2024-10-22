@@ -1,12 +1,9 @@
 import { RuntimeTransaction } from './runtime-transaction';
 
-export enum Status {
-  Processing,
-  Processed,
-}
+export type ProcessedTransactionStatus = 'Processing' | 'Processed' | { Failed: string };
 
 export interface ProcessedTransaction {
   runtime_transaction: RuntimeTransaction;
-  status: Status;
+  status: ProcessedTransactionStatus;
   bitcoin_txid: string | undefined;
 }

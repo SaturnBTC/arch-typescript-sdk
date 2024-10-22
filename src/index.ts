@@ -26,5 +26,5 @@ export * as AccountUtil from './serde/account';
 export * as UtxoMetaUtil from './serde/utxo';
 export type {
   ProcessedTransaction,
-  Status,
+  ProcessedTransactionStatus,
 } from './struct/processed-transaction';
