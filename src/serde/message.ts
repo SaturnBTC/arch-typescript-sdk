@@ -1,6 +1,7 @@
 import { sha256 } from '@noble/hashes/sha256';
 import { Message } from '../struct/message';
 import { serialize as serializeInstruction } from './instruction';
+import { hex } from '@scure/base';
 
 export const serialize = (message: Message) => {
   const signersCount = new Uint8Array([message.signers.length]);
@@ -23,5 +24,5 @@ export const serialize = (message: Message) => {
 
 export const hash = (message: Message) => {
   const serializedData = serialize(message);
-  return sha256(sha256(serializedData));
+  return sha256(hex.encode(sha256(serializedData)));
 };
