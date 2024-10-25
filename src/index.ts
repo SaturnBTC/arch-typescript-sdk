@@ -28,3 +28,4 @@ export type {
   ProcessedTransaction,
   ProcessedTransactionStatus,
 } from './struct/processed-transaction';
+export * as SignatureUtil from './signatures';
