@@ -1,5 +1,7 @@
+import { hex } from '@scure/base';
 import { Instruction } from '../struct/instruction';
 import { serialize as serializeAccountMeta } from './account';
+import { AccountUtil } from '..';
 
 export const serialize = (instruction: Instruction): Uint8Array => {
   const serializedProgramId = instruction.program_id;
@@ -21,4 +23,20 @@ export const serialize = (instruction: Instruction): Uint8Array => {
     ...littleEndianDataLength,
     ...instruction.data,
   ]);
+};
+
+export const toHex = (instruction: Instruction) => {
+  return {
+    program_id: hex.encode(instruction.program_id),
+    accounts: instruction.accounts.map(AccountUtil.toHex),
+    data: hex.encode(instruction.data),
+  };
+};
+
+export const toNumberArray = (instruction: Instruction) => {
+  return {
+    program_id: Array.from(instruction.program_id),
+    accounts: instruction.accounts.map(AccountUtil.toNumberArray),
+    data: Array.from(instruction.data),
+  };
 };

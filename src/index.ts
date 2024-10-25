@@ -24,6 +24,7 @@ export * as PubkeyUtil from './serde/pubkey';
 export * as InstructionUtil from './serde/instruction';
 export * as AccountUtil from './serde/account';
 export * as UtxoMetaUtil from './serde/utxo';
+export * as TransactionUtil from './serde/transaction';
 export type {
   ProcessedTransaction,
   ProcessedTransactionStatus,
