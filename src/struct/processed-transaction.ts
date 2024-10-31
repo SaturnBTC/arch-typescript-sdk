@@ -5,5 +5,5 @@ export type ProcessedTransactionStatus = 'Processing' | 'Processed' | { Failed: 
 export interface ProcessedTransaction {
   runtime_transaction: RuntimeTransaction;
   status: ProcessedTransactionStatus;
-  bitcoin_txid: string | undefined;
+  bitcoin_txid: string | null;
 }
