@@ -42,26 +42,41 @@ export async function postData<T>(
 
     return response.text();
   } catch (err) {
-    throw Error('post data should not fail');
+    console.error(err);
+    throw Error('Error requesting data from rpc', { cause: err });
   }
 }
 
 export function processResult<T>(response: string): T {
-  try {
-    const result: Value = JSON.parse(response);
+  const result: Value = JSON.parse(response);
 
-    if (typeof result !== 'object' || result === null) {
-      throw new Error('unexpected output');
-    }
-
-    if ('error' in result) {
-      throw new Error(JSON.stringify(result.error));
-    }
-
-    return result.result as T;
-  } catch (error: any) {
-    throw new Error(
-      `Processing result failed: ${'message' in error ? error.message : 'unknown'}`,
+  if (typeof result !== 'object' || result === null) {
+    throw new ArchRpcError(
+      {
+        code: 0,
+        message: 'unexpected output',
+      },
+      { cause: response },
     );
+  }
+
+  if ('error' in result) {
+    throw new ArchRpcError(result.error, { cause: response });
+  }
+
+  return result.result as T;
+}
+
+export interface ArchRpcErrorType {
+  code: number;
+  message: string;
+}
+
+export class ArchRpcError extends Error {
+  error: ArchRpcErrorType;
+
+  constructor(error: ArchRpcErrorType, options?: ErrorOptions) {
+    super(error.message, options);
+    this.error = error;
   }
 }

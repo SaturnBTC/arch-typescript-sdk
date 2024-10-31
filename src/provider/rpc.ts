@@ -5,7 +5,7 @@ import { ProcessedTransaction } from '../struct/processed-transaction';
 import { Pubkey } from '../struct/pubkey';
 import { RuntimeTransaction } from '../struct/runtime-transaction';
 import { ProgramAccount, AccountFilter } from '../struct/program-account';
-import { postData, processResult } from '../utils';
+import { ArchRpcError, postData, processResult } from '../utils';
 
 import {
   deserializeWithUint8Array,
@@ -109,8 +109,10 @@ export class RpcConnection implements Provider {
     try {
       return processResult<Block>(result);
     } catch (error: any) {
-      if (error.code === NOT_FOUND) {
-        return undefined;
+      if (error instanceof ArchRpcError) {
+        if (error.error.code === NOT_FOUND) {
+          return undefined;
+        }
       }
 
       throw error;
@@ -161,8 +163,10 @@ export class RpcConnection implements Provider {
         processResult<SerializeUint8Array<ProcessedTransaction>>(result);
       return deserializeWithUint8Array<ProcessedTransaction>(response);
     } catch (error: any) {
-      if (error.code === NOT_FOUND) {
-        return undefined;
+      if (error instanceof ArchRpcError) {
+        if (error.error.code === NOT_FOUND) {
+          return undefined;
+        }
       }
 
       throw error;
