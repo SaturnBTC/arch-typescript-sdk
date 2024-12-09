@@ -7,24 +7,9 @@ export interface Arch extends Provider {
   createNewAccount: () => Promise<CreatedAccount>;
 }
 
-export const ArchConnection = (provider: Provider): Arch => {
-  return {
-    sendTransaction: provider.sendTransaction.bind(provider),
-    sendTransactions: provider.sendTransactions.bind(provider),
-    readAccountInfo: provider.readAccountInfo.bind(provider),
-    getAccountAddress: provider.getAccountAddress.bind(provider),
-    getBestBlockHash: provider.getBestBlockHash.bind(provider),
-    getBlock: provider.getBlock.bind(provider),
-    getBlockCount: provider.getBlockCount.bind(provider),
-    getBlockHash: provider.getBlockHash.bind(provider),
-    getProgramAccounts: provider.getProgramAccounts.bind(provider),
-    getProcessedTransaction: provider.getProcessedTransaction.bind(provider),
-
-    /**
-     * Creates a new account.
-     * @returns A promise that resolves with the created account.
-     */
-    createNewAccount: async (): Promise<CreatedAccount> => {
+export const ArchConnection = <T extends Provider>(provider: T): Arch & T => {
+  const archExtensions = {
+    async createNewAccount(): Promise<CreatedAccount> {
       const newShardPrivKey = secp256k1.utils.randomPrivateKey();
       const newShardPubkey = secp256k1
         .getPublicKey(newShardPrivKey, true)
@@ -38,4 +23,9 @@ export const ArchConnection = (provider: Provider): Arch => {
       };
     },
   };
+
+  // Add any Arch methods onto the provider instance itself.
+  Object.assign(provider, archExtensions);
+
+  return provider as Arch & T;
 };

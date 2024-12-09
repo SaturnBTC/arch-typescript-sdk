@@ -1,5 +1,5 @@
 export { RpcConnection } from './provider/rpc';
-export { Maestro } from './provider/maestro';
+export { Maestro } from './provider/maestro/maestro';
 export type { Arch } from './arch';
 export { ArchConnection } from './arch';
 export { Action } from './constants';
