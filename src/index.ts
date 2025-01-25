@@ -28,5 +28,7 @@ export * as TransactionUtil from './serde/transaction';
 export type {
   ProcessedTransaction,
   ProcessedTransactionStatus,
+  RollbackStatus,
 } from './struct/processed-transaction';
 export * as SignatureUtil from './signatures';
+export { ArchRpcError } from './utils';
