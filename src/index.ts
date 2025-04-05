@@ -8,6 +8,7 @@ export type {
   AccountMeta,
   AccountInfoResult,
   CreatedAccount,
+  CreatedPdaAccount,
 } from './struct/account';
 export type { Instruction } from './struct/instruction';
 export { InstructionSchema } from './struct/instruction';
@@ -30,5 +31,6 @@ export type {
   ProcessedTransactionStatus,
   RollbackStatus,
 } from './struct/processed-transaction';
+export * as Instructions from './instructions';
 export * as SignatureUtil from './signatures';
 export { ArchRpcError } from './utils';

@@ -38,3 +38,8 @@ export interface CreatedAccount {
   pubkey: string;
   address: string;
 }
+
+export interface CreatedPdaAccount {
+  address: string;
+  pubkey: string;
+}
