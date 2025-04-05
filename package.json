@@ -1,12 +1,17 @@
 {
   "name": "@saturnbtcio/arch-sdk",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "Arch SDK",
+  "author": "Saturn BTC",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "type": "module",
+  "publishConfig": {
+    "access": "public"
+  },
   "files": [
-    "dist"
+    "dist",
+    "package.json",
+    "README.md"
   ],
   "repository": {
     "type": "git",
