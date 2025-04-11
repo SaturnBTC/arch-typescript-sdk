@@ -1,11 +1,25 @@
 import { RuntimeTransaction } from './runtime-transaction';
 
 export type ProcessedTransactionStatus =
-  | 'Processing'
-  | 'Processed'
-  | { Failed: string };
+  | {
+      type: 'processing';
+    }
+  | {
+      type: 'processed';
+    }
+  | {
+      type: 'failed';
+      message: string;
+    };
 
-export type RollbackStatus = { Rolledback: string } | 'NotRolledback';
+export type RollbackStatus =
+  | {
+      type: 'notRolledback';
+    }
+  | {
+      type: 'rolledback';
+      message: string;
+    };
 
 export interface ProcessedTransaction {
   runtime_transaction: RuntimeTransaction;
