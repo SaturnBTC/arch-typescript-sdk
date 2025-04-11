@@ -11,6 +11,10 @@ export const systemProgram = () => {
 };
 
 export const fromHex = (hex: string) => {
+  if (hex.length !== 64) {
+    throw new Error('Invalid hex length. Expected 64 characters.');
+  }
+
   const data = Buffer.from(hex, 'hex');
   const tmp = new Uint8Array(32);
   tmp.set(data.subarray(0, 32));
