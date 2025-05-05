@@ -2,9 +2,12 @@ import { Action } from '../constants';
 import { AccountInfoResult } from '../struct/account';
 import { Block } from '../struct/block';
 import { ProcessedTransaction } from '../struct/processed-transaction';
+import { AccountFilter, ProgramAccount } from '../struct/program-account';
 import { Pubkey } from '../struct/pubkey';
-import { RuntimeTransaction } from '../struct/runtime-transaction';
-import { ProgramAccount, AccountFilter } from '../struct/program-account';
+import {
+  RuntimeTransaction,
+  validateRunTimeTransactions,
+} from '../struct/runtime-transaction';
 import { ArchRpcError, postData, processResult } from '../utils';
 
 import {
@@ -12,6 +15,7 @@ import {
   SerializeUint8Array,
   serializeWithUint8Array,
 } from '../serde/uint8array';
+import { validatePubkey } from '../validation';
 import { Provider } from './provider';
 
 const NOT_FOUND = 404;
@@ -29,6 +33,7 @@ export class RpcConnection implements Provider {
    * @returns A promise that resolves with the transaction result.
    */
   async sendTransaction(params: RuntimeTransaction) {
+    validateRunTimeTransactions([params]);
     return processResult<string>(
       await postData(
         this.nodeUrl,
@@ -44,6 +49,7 @@ export class RpcConnection implements Provider {
    * @returns A promise that resolves with the transaction results.
    */
   async sendTransactions(params: Array<RuntimeTransaction>) {
+    validateRunTimeTransactions(params);
     return processResult<string[]>(
       await postData(
         this.nodeUrl,
@@ -59,6 +65,7 @@ export class RpcConnection implements Provider {
    * @returns A promise that resolves with the account information.
    */
   async readAccountInfo(pubkey: Pubkey) {
+    validatePubkey(pubkey);
     const result = processResult<SerializeUint8Array<AccountInfoResult>>(
       await postData(
         this.nodeUrl,
@@ -76,6 +83,7 @@ export class RpcConnection implements Provider {
    * @returns A promise that resolves with the account address.
    */
   async getAccountAddress(pubkey: Pubkey): Promise<string> {
+    validatePubkey(pubkey);
     const result = await postData(
       this.nodeUrl,
       Action.GET_ACCOUNT_ADDRESS,
@@ -183,6 +191,7 @@ export class RpcConnection implements Provider {
     programId: Pubkey,
     filters?: AccountFilter[],
   ): Promise<ProgramAccount[]> {
+    validatePubkey(programId);
     const result = await postData(this.nodeUrl, Action.GET_PROGRAM_ACCOUNTS, [
       serializeWithUint8Array(programId),
       filters,
