@@ -14,6 +14,12 @@ export type { Instruction } from './struct/instruction';
 export { InstructionSchema } from './struct/instruction';
 export type { Message } from './struct/message';
 export { MessageSchema } from './struct/message';
+export type { SanitizedMessage } from './struct/sanitizied-message';
+export { SanitizedMessageSchema } from './struct/sanitizied-message';
+export type { SanitizedInstruction } from './struct/sanitizied-instruction';
+export { SanitizedInstructionSchema } from './struct/sanitizied-instruction';
+export type { MessageHeader } from './struct/header';
+export { MessageHeaderSchema } from './struct/header';
 export type { Pubkey } from './struct/pubkey';
 export { PubkeySchema } from './struct/pubkey';
 export type { RuntimeTransaction } from './struct/runtime-transaction';
@@ -21,8 +27,10 @@ export type { UtxoMeta, UtxoMetaData } from './struct/utxo';
 export { UtxoMetaSchema } from './struct/utxo';
 export type { Block } from './struct/block';
 export * as MessageUtil from './serde/message';
+export * as SanitizedMessageUtil from './serde/sanitizied-message';
 export * as PubkeyUtil from './serde/pubkey';
 export * as InstructionUtil from './serde/instruction';
+export * as SanitizedInstructionUtil from './serde/sanitizied-instruction';
 export * as AccountUtil from './serde/account';
 export * as UtxoMetaUtil from './serde/utxo';
 export * as TransactionUtil from './serde/transaction';
@@ -31,6 +39,5 @@ export type {
   ProcessedTransactionStatus,
   RollbackStatus,
 } from './struct/processed-transaction';
-export * as Instructions from './instructions';
 export * as SignatureUtil from './signatures';
 export { ArchRpcError } from './utils';

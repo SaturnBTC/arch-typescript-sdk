@@ -1,5 +1,5 @@
 import { RuntimeTransaction } from '../struct/runtime-transaction';
-import { MessageUtil } from '..';
+import { SanitizedMessageUtil } from '..';
 import { hex } from '@scure/base';
 
 export const toHex = (transaction: RuntimeTransaction) => {
@@ -8,7 +8,7 @@ export const toHex = (transaction: RuntimeTransaction) => {
     signatures: transaction.signatures.map((signature) =>
       hex.encode(signature),
     ),
-    message: MessageUtil.toHex(transaction.message),
+    message: SanitizedMessageUtil.toHex(transaction.message),
   };
 };
 
@@ -18,6 +18,6 @@ export const toNumberArray = (transaction: RuntimeTransaction) => {
     signatures: transaction.signatures.map((signature) =>
       Array.from(signature),
     ),
-    message: MessageUtil.toNumberArray(transaction.message),
+    message: SanitizedMessageUtil.toNumberArray(transaction.message),
   };
 };

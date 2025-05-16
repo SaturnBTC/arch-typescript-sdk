@@ -1,4 +1,4 @@
-import { Message } from './message';
+import { SanitizedMessage } from './sanitizied-message';
 
 // 64 bytes
 export type Signature = Uint8Array;
@@ -6,5 +6,5 @@ export type Signature = Uint8Array;
 export interface RuntimeTransaction {
   version: number;
   signatures: Array<Signature>;
-  message: Message;
+  message: SanitizedMessage;
 }
