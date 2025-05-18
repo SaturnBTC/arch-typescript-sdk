@@ -192,4 +192,26 @@ export class RpcConnection implements Provider {
       processResult<SerializeUint8Array<ProgramAccount[]>>(result);
     return deserializeWithUint8Array<ProgramAccount[]>(response);
   }
+
+  /**
+   * Requests an airdrop for a given public key.
+   * @param pubkey The public key to request an airdrop for.
+   * @returns A promise that resolves with the airdrop result.
+   */
+  async requestAirdrop(pubkey: Pubkey) {
+    return processResult<void>(
+      await postData(this.nodeUrl, Action.REQUEST_AIRDROP, pubkey),
+    );
+  }
+
+  /**
+   * Creates an account with a faucet for a given public key.
+   * @param pubkey The public key to create an account with a faucet for.
+   * @returns A promise that resolves with the account creation result.
+   */
+  async createAccountWithFaucet(pubkey: Pubkey) {
+    return processResult<void>(
+      await postData(this.nodeUrl, Action.CREATE_ACCOUNT_WITH_FAUCET, pubkey),
+    );
+  }
 }

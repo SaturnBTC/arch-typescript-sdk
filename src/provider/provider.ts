@@ -16,4 +16,6 @@ export interface Provider {
   getBlockHash: (blockHeight: number) => Promise<string>;
   getProgramAccounts: (programId: Pubkey) => Promise<ProgramAccount[]>;
   getProcessedTransaction: (txid: string) => Promise<ProcessedTransaction | undefined>;
+  requestAirdrop: (pubkey: Pubkey) => Promise<void>;
+  createAccountWithFaucet: (pubkey: Pubkey) => Promise<void>;
 }

@@ -311,4 +311,34 @@ export class Maestro implements Provider {
     const result = (await response.json()) as ProgramAccountResponse;
     return deserializeWithUint8Array<ProgramAccount[]>(result.data);
   }
+
+  async requestAirdrop(pubkey: Pubkey) {
+    // const response = await fetch(`${this.url}/rpc/airdrop/request`, {
+    //   method: 'POST',
+    //   headers: this.commonHeaders(),
+    //   body: JSON.stringify(pubkey),
+    // });
+
+    // if (!response.ok) {
+    //   const body = await response.text();
+    //   throw Error(`Failed to request airdrop: ${body}`);
+    // }
+
+    throw new Error('Not implemented');
+  }
+
+  async createAccountWithFaucet(pubkey: Pubkey) {
+    // const response = await fetch(`${this.url}/rpc/account/faucet`, {
+    //   method: 'POST',
+    //   headers: this.commonHeaders(),
+    //   body: JSON.stringify(pubkey),
+    // });
+
+    // if (!response.ok) {
+    //   const body = await response.text();
+    //   throw Error(`Failed to create account with faucet: ${body}`);
+    // }
+
+    throw new Error('Not implemented');
+  }
 }

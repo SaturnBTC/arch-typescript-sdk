@@ -13,6 +13,8 @@ export enum Action {
   GET_PROCESSED_TRANSACTION = 'get_processed_transaction',
   GET_ACCOUNT_ADDRESS = 'get_account_address',
   GET_PROGRAM_ACCOUNTS = 'get_program_accounts',
+  REQUEST_AIRDROP = 'request_airdrop',
+  CREATE_ACCOUNT_WITH_FAUCET = 'create_account_with_faucet',
 }
 
 export const RUNTIME_TX_SIZE_LIMIT = 1024; /** usize */
