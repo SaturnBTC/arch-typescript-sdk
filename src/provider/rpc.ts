@@ -200,7 +200,11 @@ export class RpcConnection implements Provider {
    */
   async requestAirdrop(pubkey: Pubkey) {
     return processResult<void>(
-      await postData(this.nodeUrl, Action.REQUEST_AIRDROP, pubkey),
+      await postData(
+        this.nodeUrl,
+        Action.REQUEST_AIRDROP,
+        serializeWithUint8Array(pubkey),
+      ),
     );
   }
 
@@ -211,7 +215,11 @@ export class RpcConnection implements Provider {
    */
   async createAccountWithFaucet(pubkey: Pubkey) {
     return processResult<void>(
-      await postData(this.nodeUrl, Action.CREATE_ACCOUNT_WITH_FAUCET, pubkey),
+      await postData(
+        this.nodeUrl,
+        Action.CREATE_ACCOUNT_WITH_FAUCET,
+        serializeWithUint8Array(pubkey),
+      ),
     );
   }
 }

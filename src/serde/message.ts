@@ -25,7 +25,11 @@ export const serialize = (message: Message) => {
 
 export const hash = (message: Message) => {
   const serializedData = serialize(message);
-  return sha256(hex.encode(sha256(serializedData)));
+  const firstHash = sha256(serializedData);
+  const hexString = hex.encode(firstHash);
+  const hexBytes = new TextEncoder().encode(hexString);
+  const finalHash = sha256(hexBytes);
+  return new TextEncoder().encode(hex.encode(finalHash));
 };
 
 export const toHex = (message: Message) => {

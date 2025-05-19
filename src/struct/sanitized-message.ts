@@ -4,7 +4,7 @@ import { MessageHeader, MessageHeaderSchema } from './header';
 import {
   SanitizedInstruction,
   SanitizedInstructionSchema,
-} from './sanitizied-instruction';
+} from './sanitized-instruction';
 
 export interface SanitizedMessage {
   header: MessageHeader;

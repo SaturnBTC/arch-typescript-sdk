@@ -1,4 +1,4 @@
-import { SanitizedMessage } from './sanitizied-message';
+import { SanitizedMessage } from './sanitized-message';
 
 // 64 bytes
 export type Signature = Uint8Array;

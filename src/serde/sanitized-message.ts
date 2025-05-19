@@ -1,7 +1,7 @@
 import { sha256 } from '@noble/hashes/sha256';
-import { serialize as serializeInstruction } from './sanitizied-instruction';
+import { serialize as serializeInstruction } from './sanitized-instruction';
 import { hex } from '@scure/base';
-import { SanitizedMessage } from '../struct/sanitizied-message';
+import { SanitizedMessage } from '../struct/sanitized-message';
 import { MessageHeader } from '../struct/header';
 import { Pubkey, SanitizedInstruction, SanitizedInstructionUtil } from '..';
 import { Instruction } from '../struct/instruction';
@@ -51,7 +51,11 @@ export const serialize = (message: SanitizedMessage) => {
 
 export const hash = (message: SanitizedMessage) => {
   const serializedData = serialize(message);
-  return sha256(hex.encode(sha256(serializedData)));
+  const firstHash = sha256(serializedData);
+  const hexString = hex.encode(firstHash);
+  const hexBytes = new TextEncoder().encode(hexString);
+  const finalHash = sha256(hexBytes);
+  return new TextEncoder().encode(hex.encode(finalHash));
 };
 
 export const toHex = (message: SanitizedMessage) => {

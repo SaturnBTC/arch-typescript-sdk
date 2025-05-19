@@ -1,5 +1,5 @@
 import { hex } from '@scure/base';
-import { SanitizedInstruction } from '../struct/sanitizied-instruction';
+import { SanitizedInstruction } from '../struct/sanitized-instruction';
 
 export const serialize = (instruction: SanitizedInstruction): Uint8Array => {
   const serializedProgramId = instruction.program_id_index;
