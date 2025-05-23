@@ -19,6 +19,7 @@ export interface AccountMeta {
 }
 
 export interface AccountInfoResult {
+  lamports: number;
   owner: Pubkey;
   data: Uint8Array;
   utxo: string;
