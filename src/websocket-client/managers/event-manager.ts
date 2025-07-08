@@ -73,9 +73,9 @@ export class EventManager {
   private setupEventListeners(): void {
     if (!this.socket) return;
 
-    // CHECK:Listen for all event types
+    // Listen for all event types
     Object.values(EventTopic).forEach((topic) => {
-      this.socket!.on(topic, (data: any) => {
+      this.socket!.on(topic, (data: unknown) => {
         this.handleEvent({ topic, data } as ArchWebSocketEvent);
       });
     });

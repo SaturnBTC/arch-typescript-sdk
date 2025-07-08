@@ -21,20 +21,20 @@ export interface BlockEvent {
 export interface TransactionEvent {
   hash: string;
   status: TransactionStatus | { Failed: string };
-  program_ids: string[];
+  programIds: string[];
 }
 
 export interface AccountUpdateEvent {
   account: string;
-  transaction_hash: string;
+  transactionHash: string;
 }
 
 export interface RolledbackTransactionsEvent {
-  transaction_hashes: string[];
+  transactionHashes: string[];
 }
 
 export interface ReappliedTransactionsEvent {
-  transaction_hashes: string[];
+  transactionHashes: string[];
 }
 
 export interface DKGEvent {
@@ -56,5 +56,3 @@ export type EventCallback<T extends EventTopic> = (
 export type AsyncEventCallback<T extends EventTopic> = (
   event: Extract<ArchWebSocketEvent, { topic: T }>,
 ) => Promise<void>;
-
-export type ConnectionCallback = (connected: boolean) => void;

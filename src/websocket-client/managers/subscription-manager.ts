@@ -6,6 +6,7 @@ import {
   SubscribeRequest,
   SubscriptionResponse,
   UnsubscribeRequest,
+  UnsubscribeResponse,
 } from '../types/messages';
 
 interface SubscriptionHandler {
@@ -84,13 +85,13 @@ export class SubscriptionManager {
           if (response.status === 'Subscribed') {
             // Update subscription with confirmed ID
             this.subscriptions.delete(pendingId);
-            this.subscriptions.set(response.subscription_id, {
-              id: response.subscription_id,
+            this.subscriptions.set(response.subscriptionId, {
+              id: response.subscriptionId,
               topic,
               filter,
               pending: false,
             });
-            resolve(response.subscription_id);
+            resolve(response.subscriptionId);
           } else {
             this.subscriptions.delete(pendingId);
             reject(
@@ -132,7 +133,7 @@ export class SubscriptionManager {
 
     const request: UnsubscribeRequest = {
       topic: subscription.topic,
-      subscription_id: subscriptionId,
+      subscriptionId,
     };
 
     return new Promise<void>((resolve, reject) => {
@@ -145,8 +146,8 @@ export class SubscriptionManager {
         );
       }, 10000);
 
-      const responseHandler = (response: any) => {
-        if (response.subscription_id === subscriptionId) {
+      const responseHandler = (response: UnsubscribeResponse) => {
+        if (response.subscriptionId === subscriptionId) {
           clearTimeout(timeout);
           this.subscriptions.delete(subscriptionId);
           resolve();
@@ -181,6 +182,7 @@ export class SubscriptionManager {
   }
 
   async resubscribeAll(): Promise<void> {
+    // Only active subscriptions
     const subscriptions = Array.from(this.subscriptions.values()).filter(
       (sub) => !sub.pending,
     );
@@ -220,9 +222,9 @@ export class SubscriptionManager {
       },
     );
 
-    this.socket.on('unsubscribe_response', (response: any) => {
+    this.socket.on('unsubscribe_response', (response: UnsubscribeResponse) => {
       this.socket!.emit(
-        `unsubscribe_response_${response.subscription_id}`,
+        `unsubscribe_response_${response.subscriptionId}`,
         response,
       );
     });

@@ -7,19 +7,9 @@ export interface SubscribeRequest {
   request_id?: string;
 }
 
-export interface WebSocketSubscribeRequest {
-  method: 'subscribe';
-  params: SubscribeRequest;
-}
-
 export interface UnsubscribeRequest {
   topic: EventTopic;
-  subscription_id: string;
-}
-
-export interface WebSocketUnsubscribeRequest {
-  method: 'unsubscribe';
-  params: UnsubscribeRequest;
+  subscriptionId: string;
 }
 
 export enum SubscriptionStatus {
@@ -30,24 +20,13 @@ export enum SubscriptionStatus {
 
 export interface SubscriptionResponse {
   status: SubscriptionStatus;
-  subscription_id: string;
+  subscriptionId: string;
   topic: EventTopic;
   request_id?: string;
 }
 
 export interface UnsubscribeResponse {
   status: SubscriptionStatus;
-  subscription_id: string;
+  subscriptionId: string;
   message: string;
 }
-
-export interface SubscriptionErrorResponse {
-  status: SubscriptionStatus;
-  error: string;
-}
-
-export type WebSocketMessage =
-  | { topic: EventTopic; data: any }
-  | SubscriptionResponse
-  | UnsubscribeResponse
-  | SubscriptionErrorResponse;

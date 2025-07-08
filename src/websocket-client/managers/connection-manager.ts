@@ -151,9 +151,9 @@ export class ConnectionManager {
     if (!this.socket) return;
 
     this.socket.on('connect', () => {
-      this.connectCallbacks.forEach((cb) => {
+      this.connectCallbacks.forEach((connectCallback) => {
         try {
-          cb();
+          connectCallback();
         } catch (e) {
           throw new WebSocketError(
             WebSocketErrorType.Other,
@@ -165,9 +165,9 @@ export class ConnectionManager {
     });
 
     this.socket.on('disconnect', (reason) => {
-      this.disconnectCallbacks.forEach((cb) => {
+      this.disconnectCallbacks.forEach((disconnectCallback) => {
         try {
-          cb();
+          disconnectCallback();
         } catch (e) {
           throw new WebSocketError(
             WebSocketErrorType.Other,

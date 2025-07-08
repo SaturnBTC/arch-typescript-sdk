@@ -19,17 +19,14 @@ export class ArchWebSocketClient {
   private eventManager: EventManager;
   private reconnectionManager: ReconnectionManager;
   private options: WebSocketClientOptions;
-  private _autoReconnectHandler: (() => void) | undefined;
+  private autoReconnectHandler: (() => void) | undefined;
 
   constructor(options: WebSocketClientOptions) {
     this.options = {
       url: options.url,
       maxReconnectAttempts:
         options.maxReconnectAttempts ?? DEFAULT_OPTIONS.maxReconnectAttempts,
-      reconnectInterval:
-        options.reconnectInterval ?? DEFAULT_OPTIONS.reconnectInterval,
-      pingInterval: options.pingInterval ?? DEFAULT_OPTIONS.pingInterval,
-      pongTimeout: options.pongTimeout ?? DEFAULT_OPTIONS.pongTimeout,
+      backoffStrategy: options.backoffStrategy,
       autoReconnect: options.autoReconnect ?? DEFAULT_OPTIONS.autoReconnect,
       timeout: options.timeout ?? DEFAULT_OPTIONS.timeout,
       transports: options.transports ?? DEFAULT_OPTIONS.transports,
@@ -54,16 +51,16 @@ export class ArchWebSocketClient {
 
       // Setup auto-reconnect if enabled
       if (this.options.autoReconnect) {
-        if (this._autoReconnectHandler) {
-          socket.off('disconnect', this._autoReconnectHandler);
+        if (this.autoReconnectHandler) {
+          socket.off('disconnect', this.autoReconnectHandler);
         }
-        this._autoReconnectHandler = this._autoReconnectHandlerImpl.bind(this);
-        socket.on('disconnect', this._autoReconnectHandler);
+        this.autoReconnectHandler = this.autoReconnectHandlerImpl.bind(this);
+        socket.on('disconnect', this.autoReconnectHandler);
       }
     }
   }
 
-  private async _autoReconnectHandlerImpl() {
+  private async autoReconnectHandlerImpl() {
     if (this.reconnectionManager.shouldReconnect()) {
       this.reconnectionManager.scheduleReconnect(async () => {
         try {
@@ -71,19 +68,19 @@ export class ArchWebSocketClient {
           this.reconnectionManager.resetAttempts();
           await this.subscriptionManager.resubscribeAll();
         } catch {
-          this._autoReconnectHandlerImpl();
+          this.autoReconnectHandlerImpl();
         }
       });
     }
   }
 
   async disconnect(): Promise<void> {
-    if (this._autoReconnectHandler) {
+    if (this.autoReconnectHandler) {
       const socket = this.connectionManager.getSocket();
       if (socket) {
-        socket.off('disconnect', this._autoReconnectHandler);
+        socket.off('disconnect', this.autoReconnectHandler);
       }
-      this._autoReconnectHandler = undefined;
+      this.autoReconnectHandler = undefined;
     }
     this.reconnectionManager.cancelReconnect();
     return this.connectionManager.disconnect();

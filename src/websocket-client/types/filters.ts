@@ -6,7 +6,7 @@ export interface EventFilter {
 
 export interface TransactionFilter extends EventFilter {
   status?: TransactionStatus;
-  program_ids?: string[];
+  programIds?: string[];
 }
 
 export interface BlockFilter extends EventFilter {
