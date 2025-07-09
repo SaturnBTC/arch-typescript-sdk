@@ -1,3 +1,4 @@
+import { Socket } from 'socket.io-client';
 import {
   BackoffStrategy,
   DEFAULT_BACKOFF_STRATEGY,
@@ -7,10 +8,10 @@ import {
   WebSocketClientOptions,
 } from './config/web-socket-config';
 import { ConnectionManager } from './managers/connection-manager';
-import { EventManager } from './managers/event-manager';
+import { ArchEventCallback, EventManager } from './managers/event-manager';
 import { ReconnectionManager } from './managers/reconnection-manager';
 import { SubscriptionManager } from './managers/subscription-manager';
-import { AsyncEventCallback, EventCallback, EventTopic } from './types/events';
+import { ArchSocketEvent, EventTopic } from './types/events';
 import { EventFilter } from './types/filters';
 
 export class ArchWebSocketClient {
@@ -20,6 +21,7 @@ export class ArchWebSocketClient {
   private reconnectionManager: ReconnectionManager;
   private options: WebSocketClientOptions;
   private autoReconnectHandler: (() => void) | undefined;
+  private socket: Socket | null = null;
 
   constructor(options: WebSocketClientOptions) {
     this.options = {
@@ -44,18 +46,17 @@ export class ArchWebSocketClient {
 
   async connect(): Promise<void> {
     await this.connectionManager.connect();
-    const socket = this.connectionManager.getSocket();
-    if (socket) {
-      this.subscriptionManager.setSocket(socket);
-      this.eventManager.setSocket(socket);
-
+    this.socket = this.connectionManager.getSocket();
+    if (this.socket) {
+      this.subscriptionManager.setSocket(this.socket);
+      this.attachAllListeners();
       // Setup auto-reconnect if enabled
       if (this.options.autoReconnect) {
         if (this.autoReconnectHandler) {
-          socket.off('disconnect', this.autoReconnectHandler);
+          this.socket.off('disconnect', this.autoReconnectHandler);
         }
         this.autoReconnectHandler = this.autoReconnectHandlerImpl.bind(this);
-        socket.on('disconnect', this.autoReconnectHandler);
+        this.socket.on('disconnect', this.autoReconnectHandler);
       }
     }
   }
@@ -76,9 +77,8 @@ export class ArchWebSocketClient {
 
   async disconnect(): Promise<void> {
     if (this.autoReconnectHandler) {
-      const socket = this.connectionManager.getSocket();
-      if (socket) {
-        socket.off('disconnect', this.autoReconnectHandler);
+      if (this.socket) {
+        this.socket.off('disconnect', this.autoReconnectHandler);
       }
       this.autoReconnectHandler = undefined;
     }
@@ -91,59 +91,67 @@ export class ArchWebSocketClient {
   }
 
   /**
-   * Subscribe to a topic with a synchronous event handler.
-   * Returns an unsubscribe function that removes both the event handler and the subscription.
+   * Subscribe to a topic with an async callback. Returns the subscription ID.
    */
-  async subscribe<T extends EventTopic>(
-    topic: T,
-    handler: EventCallback<T>,
+  async subscribe(
+    topic: EventTopic,
+    callback: ArchEventCallback,
     filter?: EventFilter,
-  ): Promise<() => void> {
+  ): Promise<string> {
     const subscriptionId = await this.subscriptionManager.subscribe(
       topic,
       filter,
     );
-    const unsubscribeEvent = this.eventManager.onEvent(topic, handler);
-    return async () => {
-      unsubscribeEvent();
+    this.eventManager.addListener(topic, callback);
+    if (this.socket) {
+      this.socket.on(topic, callback);
+    }
+    return subscriptionId;
+  }
+
+  // Add additional listeners
+  on(event: ArchSocketEvent, callback: ArchEventCallback) {
+    this.eventManager.addListener(event, callback);
+    if (this.socket) {
+      this.socket.on(event, callback);
+    }
+  }
+
+  // Remove a specific listener
+  off(event: ArchSocketEvent, callback: ArchEventCallback) {
+    this.eventManager.removeListener(event, callback);
+    if (this.socket) {
+      this.socket.off(event, callback);
+    }
+  }
+
+  // Unsubscribe and remove all listeners for the topic
+  async unsubscribe(topic: EventTopic): Promise<void> {
+    await this.subscriptionManager.unsubscribeTopic(topic);
+    const listeners = this.eventManager.getListeners(topic);
+    if (listeners && this.socket) {
+      for (const cb of listeners) {
+        this.socket.off(topic, cb);
+      }
+    }
+    this.eventManager.removeAllListeners(topic);
+  }
+
+  // Unsubscribe by subscription ID and remove all listeners for the associated topic
+  async unsubscribeById(subscriptionId: string): Promise<void> {
+    // Find the topic for this subscriptionId
+    const activeSubs = this.subscriptionManager.getActiveSubscriptions();
+    const sub = activeSubs.find((s) => s.id === subscriptionId);
+    if (sub) {
       await this.subscriptionManager.unsubscribe(subscriptionId);
-    };
-  }
-
-  onConnect(callback: () => void): () => void {
-    return this.connectionManager.onConnect(callback);
-  }
-
-  onDisconnect(callback: () => void): () => void {
-    return this.connectionManager.onDisconnect(callback);
-  }
-
-  /**
-   * Subscribe to a topic with an asynchronous event handler.
-   * Returns an unsubscribe function that removes both the event handler and the subscription.
-   */
-  async subscribeAsync<T extends EventTopic>(
-    topic: T,
-    handler: AsyncEventCallback<T>,
-    filter?: EventFilter,
-  ): Promise<() => void> {
-    const subscriptionId = await this.subscriptionManager.subscribe(
-      topic,
-      filter,
-    );
-    const unsubscribeEvent = this.eventManager.onEventAsync(topic, handler);
-    return async () => {
-      unsubscribeEvent();
-      await this.subscriptionManager.unsubscribe(subscriptionId);
-    };
-  }
-
-  async unsubscribe(subscriptionId: string): Promise<void> {
-    return this.subscriptionManager.unsubscribe(subscriptionId);
-  }
-
-  async unsubscribeTopic(topic: EventTopic): Promise<void> {
-    return this.subscriptionManager.unsubscribeTopic(topic);
+      const listeners = this.eventManager.getListeners(sub.topic);
+      if (listeners && this.socket) {
+        for (const cb of listeners) {
+          this.socket.off(sub.topic, cb);
+        }
+      }
+      this.eventManager.removeAllListeners(sub.topic);
+    }
   }
 
   setReconnectOptions(
@@ -156,5 +164,17 @@ export class ArchWebSocketClient {
 
   enableKeepAlive(interval: number): void {
     this.connectionManager.enableKeepAlive(interval);
+  }
+
+  private attachAllListeners() {
+    if (!this.socket) return;
+    const allListeners = this.eventManager.getAllListeners();
+    if (allListeners.size === 0) return; // No listeners to attach
+
+    for (const [event, callbacks] of allListeners) {
+      for (const callback of callbacks) {
+        this.socket.on(event, callback);
+      }
+    }
   }
 }

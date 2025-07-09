@@ -41,18 +41,4 @@ export interface DKGEvent {
   status: string;
 }
 
-export type ArchWebSocketEvent =
-  | { topic: 'block'; data: BlockEvent }
-  | { topic: 'transaction'; data: TransactionEvent }
-  | { topic: 'account_update'; data: AccountUpdateEvent }
-  | { topic: 'rolledback_transactions'; data: RolledbackTransactionsEvent }
-  | { topic: 'reapplied_transactions'; data: ReappliedTransactionsEvent }
-  | { topic: 'dkg'; data: DKGEvent };
-
-export type EventCallback<T extends EventTopic> = (
-  event: Extract<ArchWebSocketEvent, { topic: T }>,
-) => void;
-
-export type AsyncEventCallback<T extends EventTopic> = (
-  event: Extract<ArchWebSocketEvent, { topic: T }>,
-) => Promise<void>;
+export type ArchSocketEvent = EventTopic | 'connect' | 'disconnect';
