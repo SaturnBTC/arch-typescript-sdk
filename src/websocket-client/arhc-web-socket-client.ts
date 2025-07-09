@@ -42,6 +42,14 @@ export class ArchWebSocketClient {
     this.reconnectionManager = new ReconnectionManager(
       DEFAULT_BACKOFF_STRATEGY,
     );
+    this.reconnectionManager.setOptions(
+      !!this.options.autoReconnect,
+      this.options.backoffStrategy ?? DEFAULT_BACKOFF_STRATEGY,
+      Number(
+        this.options.maxReconnectAttempts ??
+          DEFAULT_OPTIONS.maxReconnectAttempts,
+      ),
+    );
   }
 
   async connect(): Promise<void> {
