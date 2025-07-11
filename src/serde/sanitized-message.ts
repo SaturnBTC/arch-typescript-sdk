@@ -28,7 +28,7 @@ export const serialize = (message: SanitizedMessage) => {
     Array.from(accountKey),
   );
 
-  const recentBlockhashCount = hex.decode(message.recent_blockhash);
+  const recentBlockhashCount = message.recent_blockhash;
 
   const instructionBuffer = new ArrayBuffer(4);
   const instructionView = new DataView(instructionBuffer);
@@ -75,7 +75,7 @@ export const toNumberArray = (message: SanitizedMessage) => {
     account_keys: message.account_keys.map((accountKey) =>
       Array.from(accountKey),
     ),
-    recent_blockhash: Array.from(hex.decode(message.recent_blockhash)),
+    recent_blockhash: Array.from(message.recent_blockhash),
     instructions: message.instructions.map(
       SanitizedInstructionUtil.toNumberArray,
     ),
@@ -149,7 +149,7 @@ const compileTsInstructions = (
 export const createSanitizedMessage = (
   rawInstructions: Instruction[],
   payer: Pubkey | null,
-  recentBlockhash: string,
+  recentBlockhash: Uint8Array,
 ): SanitizedMessage | CompileError => {
   const compiledKeys = CompiledKeys.compile(rawInstructions, payer);
   const messageComponentsResult = compiledKeys.tryIntoMessageComponents();
