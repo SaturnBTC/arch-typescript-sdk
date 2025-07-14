@@ -122,7 +122,7 @@ describe('ArchWebSocketClient', () => {
     expect(callback2).toHaveBeenCalledWith({ hash: 'def', timestamp: 456 });
   });
 
-  it('disconnects from the server', async () => {
+  it('Disconnects from the server', async () => {
     await client.connect();
     await client.disconnect();
 
