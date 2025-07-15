@@ -1,6 +1,6 @@
 # Arch TypeScript SDK
 
-A TypeScript SDK for building, signing, and building transactions on the Arch Network. This SDK provides low-level primitives for message creation, signature handling, and transaction submission, enabling developers to build custom workflows and applications on top of the Arch protocol.
+A TypeScript SDK for building, signing, and sending transactions on the Arch Network. This SDK provides low-level primitives for message creation, signature handling, and transaction submission, enabling developers to build custom workflows and applications on top of the Arch protocol.
 
 ## Installation
 
@@ -10,7 +10,7 @@ npm install @saturnbtcio/arch-sdk
 
 ## Quickstart Example
 
-Below is a minimal example showing how to create a message, sign it, adjust the signature, and build an Arch transaction using this SDK.
+Below is a minimal example showing how to create a message, sign it, adjust the signature, and send an Arch transaction using this SDK.
 
 ```typescript
 import {
@@ -27,7 +27,7 @@ const arch = ArchConnection(provider);
 // 2. Prepare your instruction(s) (see Instruction type for structure)
 const instructions = [/* ...your instructions here... */];
 const payerPubkey = /* Uint8Array (32 bytes) */;
-const recentBlockhash = /* string (hex) */;
+const recentBlockhash = /* Call the archRpc.getBestBlockhash */;
 
 // 3. Create a SanitizedMessage
 const message = SanitizedMessageUtil.createSanitizedMessage(
@@ -38,7 +38,9 @@ const message = SanitizedMessageUtil.createSanitizedMessage(
 
 // 4. Hash the message and sign it (using your signing method)
 const messageHash = SanitizedMessageUtil.hash(message); // Uint8Array
-const signature = /* sign messageHash with your private key */;
+// Sign the message hash using your Bitcoin private key, producing a BIP322-compliant signature.
+// You can use a wallet or library that supports BIP322 signing.
+const signature = bip322Sign(privateKey, messageHash, addressType); // pseudocode
 
 // 5. Adjust the signature to the required format
 const adjustedSignature = SignatureUtil.adjustSignature(signature);
@@ -49,6 +51,10 @@ const transaction = {
   signatures: [adjustedSignature],
   message,
 };
+
+// 7. Send the transaction
+const txid = await arch.sendTransaction(transaction);
+console.log('Arch transaction ID:', txid);
 
 ```
 
@@ -75,6 +81,11 @@ const transaction = {
 
 - **RuntimeTransaction**
   - `{ version: number, signatures: Uint8Array[], message: SanitizedMessage }`
+
+### Sending Transactions
+
+- **arch.sendTransaction(transaction: RuntimeTransaction): Promise<string>**
+  - Sends a transaction to the Arch network and returns the transaction ID.
 
 ### Creating a New Account
 
@@ -117,16 +128,18 @@ const instruction = {
 };
 
 const payerPubkey = new Uint8Array(32); // Replace with your payer pubkey
-const recentBlockhash = '...'; // Replace with recent blockhash (hex string)
+const recentBlockhash = '...'; // Call the archRpc.getBestBlockhash
 
 const message = SanitizedMessageUtil.createSanitizedMessage(
   [instruction],
   payerPubkey,
-  recentBlockhash
+  recentBlockhash,
 );
 
 const messageHash = SanitizedMessageUtil.hash(message);
-const signature = /* sign messageHash with your private key */;
+// Sign the message hash with your Bitcoin private key using the BIP322 standard.
+// (You must use a wallet or library that supports BIP322 message signing.)
+const signature = bip322Sign(privateKey, messageHash, addressType); // pseudocode
 const adjustedSignature = SignatureUtil.adjustSignature(signature);
 
 const transaction = {
@@ -135,12 +148,13 @@ const transaction = {
   message,
 };
 
+const txid = await arch.sendTransaction(transaction);
+console.log('Arch transaction ID:', txid);
 ```
 
 ## Advanced Topics
 
 - **Multiple Signers**: Add multiple signatures to the `signatures` array in the transaction.
-- **Batch Transactions**: Use `arch.sendTransactions([tx1, tx2, ...])` to send multiple transactions at once.
 - **Custom Providers**: Implement the `Provider` interface for custom transport or signing logic.
 
 ## Troubleshooting
@@ -279,9 +293,7 @@ See the SDK source for all event interfaces (e.g., `BlockEvent`, `TransactionEve
 
 ---
 
-## Wallet Types and BigInt Serialization
-
-### Wallet Types
+## Wallet Types
 
 The SDK and related packages define types for representing user wallets, UTXOs, and collections:
 
@@ -306,22 +318,5 @@ interface CollectionAmount {
 ```
 
 These types are useful for wallet management, UTXO selection, and integration with pool or transaction logic.
-
-### BigInt Serialization Utilities
-
-When working with JSON APIs or storage, use these helpers to safely serialize/deserialize objects containing `bigint` fields:
-
-```typescript
-import {
-  serializeWithBigInt,
-  deserializeWithBigInt,
-} from '@saturnbtcio/pool-serde-sdk';
-
-const obj = { value: 123n };
-const jsonReady = serializeWithBigInt(obj); // { value: '123' }
-const restored = deserializeWithBigInt(jsonReady); // { value: 123n }
-```
-
-Use these utilities whenever you need to send or receive data with `bigint` values over the network or store them as JSON.
 
 ---
