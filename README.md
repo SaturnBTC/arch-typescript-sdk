@@ -1,6 +1,6 @@
 # Arch TypeScript SDK
 
-A TypeScript SDK for building, signing, and building transactions on the Arch Network. This SDK provides low-level primitives for message creation, signature handling, and transaction submission, enabling developers to build custom workflows and applications on top of the Arch protocol.
+A TypeScript SDK for building, signing, and sending transactions on the Arch Network. This SDK provides low-level primitives for message creation, signature handling, and transaction submission, enabling developers to build custom workflows and applications on top of the Arch protocol.
 
 ## Installation
 
@@ -10,7 +10,7 @@ npm install @saturnbtcio/arch-sdk
 
 ## Quickstart Example
 
-Below is a minimal example showing how to create a message, sign it, adjust the signature, and build an Arch transaction using this SDK.
+Below is a minimal example showing how to create a message, sign it, adjust the signature, and send an Arch transaction using this SDK.
 
 ```typescript
 import {
@@ -52,6 +52,10 @@ const transaction = {
   message,
 };
 
+// 7. Send the transaction
+const txid = await arch.sendTransaction(transaction);
+console.log('Arch transaction ID:', txid);
+
 ```
 
 ## API Overview
@@ -77,6 +81,11 @@ const transaction = {
 
 - **RuntimeTransaction**
   - `{ version: number, signatures: Uint8Array[], message: SanitizedMessage }`
+
+### Sending Transactions
+
+- **arch.sendTransaction(transaction: RuntimeTransaction): Promise<string>**
+  - Sends a transaction to the Arch network and returns the transaction ID.
 
 ### Creating a New Account
 
@@ -138,12 +147,14 @@ const transaction = {
   signatures: [adjustedSignature],
   message,
 };
+
+const txid = await arch.sendTransaction(transaction);
+console.log('Arch transaction ID:', txid);
 ```
 
 ## Advanced Topics
 
 - **Multiple Signers**: Add multiple signatures to the `signatures` array in the transaction.
-- **Batch Transactions**: Use `arch.sendTransactions([tx1, tx2, ...])` to send multiple transactions at once.
 - **Custom Providers**: Implement the `Provider` interface for custom transport or signing logic.
 
 ## Troubleshooting
@@ -282,9 +293,7 @@ See the SDK source for all event interfaces (e.g., `BlockEvent`, `TransactionEve
 
 ---
 
-## Wallet Types and BigInt Serialization
-
-### Wallet Types
+## Wallet Types
 
 The SDK and related packages define types for representing user wallets, UTXOs, and collections:
 
@@ -309,22 +318,5 @@ interface CollectionAmount {
 ```
 
 These types are useful for wallet management, UTXO selection, and integration with pool or transaction logic.
-
-### BigInt Serialization Utilities
-
-When working with JSON APIs or storage, use these helpers to safely serialize/deserialize objects containing `bigint` fields:
-
-```typescript
-import {
-  serializeWithBigInt,
-  deserializeWithBigInt,
-} from '@saturnbtcio/pool-serde-sdk';
-
-const obj = { value: 123n };
-const jsonReady = serializeWithBigInt(obj); // { value: '123' }
-const restored = deserializeWithBigInt(jsonReady); // { value: 123n }
-```
-
-Use these utilities whenever you need to send or receive data with `bigint` values over the network or store them as JSON.
 
 ---
