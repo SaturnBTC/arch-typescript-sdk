@@ -27,7 +27,7 @@ const arch = ArchConnection(provider);
 // 2. Prepare your instruction(s) (see Instruction type for structure)
 const instructions = [/* ...your instructions here... */];
 const payerPubkey = /* Uint8Array (32 bytes) */;
-const recentBlockhash = /* string (hex) */;
+const recentBlockhash = /* Call the archRpc.getBestBlockhash */;
 
 // 3. Create a SanitizedMessage
 const message = SanitizedMessageUtil.createSanitizedMessage(
@@ -38,7 +38,9 @@ const message = SanitizedMessageUtil.createSanitizedMessage(
 
 // 4. Hash the message and sign it (using your signing method)
 const messageHash = SanitizedMessageUtil.hash(message); // Uint8Array
-const signature = /* sign messageHash with your private key */;
+// Sign the message hash using your Bitcoin private key, producing a BIP322-compliant signature.
+// You can use a wallet or library that supports BIP322 signing.
+const signature = bip322Sign(privateKey, messageHash, addressType); // pseudocode
 
 // 5. Adjust the signature to the required format
 const adjustedSignature = SignatureUtil.adjustSignature(signature);
@@ -117,16 +119,18 @@ const instruction = {
 };
 
 const payerPubkey = new Uint8Array(32); // Replace with your payer pubkey
-const recentBlockhash = '...'; // Replace with recent blockhash (hex string)
+const recentBlockhash = '...'; // Call the archRpc.getBestBlockhash
 
 const message = SanitizedMessageUtil.createSanitizedMessage(
   [instruction],
   payerPubkey,
-  recentBlockhash
+  recentBlockhash,
 );
 
 const messageHash = SanitizedMessageUtil.hash(message);
-const signature = /* sign messageHash with your private key */;
+// Sign the message hash with your Bitcoin private key using the BIP322 standard.
+// (You must use a wallet or library that supports BIP322 message signing.)
+const signature = bip322Sign(privateKey, messageHash, addressType); // pseudocode
 const adjustedSignature = SignatureUtil.adjustSignature(signature);
 
 const transaction = {
@@ -134,7 +138,6 @@ const transaction = {
   signatures: [adjustedSignature],
   message,
 };
-
 ```
 
 ## Advanced Topics
