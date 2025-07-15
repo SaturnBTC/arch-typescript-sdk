@@ -9,7 +9,7 @@ import {
 export interface SanitizedMessage {
   header: MessageHeader;
   account_keys: Array<Pubkey>;
-  recent_blockhash: string;
+  recent_blockhash: Uint8Array;
   instructions: Array<SanitizedInstruction>;
 }
 
@@ -21,7 +21,12 @@ export const SanitizedMessageSchema: Schema = {
         type: PubkeySchema,
       },
     },
-    recent_blockhash: 'string',
+    recent_blockhash: {
+      array: {
+        type: 'u8',
+        len: 32,
+      },
+    },
     instructions: {
       array: {
         type: SanitizedInstructionSchema,
