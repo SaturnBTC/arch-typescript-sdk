@@ -58,6 +58,9 @@
     "@noble/curves": "^1.5.0",
     "@noble/hashes": "^1.4.0",
     "@scure/base": "^1.1.7",
-    "borsh": "^2.0.0"
+    "@types/socket.io": "^3.0.2",
+    "borsh": "^2.0.0",
+    "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1"
   }
 }
