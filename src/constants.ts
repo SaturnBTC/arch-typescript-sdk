@@ -15,6 +15,11 @@ export enum Action {
   GET_PROGRAM_ACCOUNTS = 'get_program_accounts',
   REQUEST_AIRDROP = 'request_airdrop',
   CREATE_ACCOUNT_WITH_FAUCET = 'create_account_with_faucet',
+  GET_BLOCK_BY_HEIGHT = 'get_block_by_height',
+  GET_TRANSACTIONS_BY_BLOCK = 'get_transactions_by_block',
+  GET_TRANSACTIONS_BY_IDS = 'get_transactions_by_ids',
+  RECENT_TRANSACTIONS = 'recent_transactions',
+  GET_MULTIPLE_ACCOUNTS = 'get_multiple_accounts',
 }
 
 export const RUNTIME_TX_SIZE_LIMIT = 1024; /** usize */
