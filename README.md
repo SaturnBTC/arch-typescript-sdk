@@ -99,6 +99,115 @@ console.log('Arch transaction ID:', txid);
 - **Signature**: `Uint8Array (64 bytes)`
 - **RuntimeTransaction**: `{ version, signatures, message }`
 
+## System Instruction Helpers
+
+The SDK provides low-level helper functions for constructing system instructions compatible with the Arch blockchain. These helpers serialize instruction data in a format expected by the on-chain Rust programs, making it easy to create, transfer, and manage accounts from TypeScript.
+
+### `createAccount`
+
+Creates a new account on the blockchain.
+
+**Parameters:**
+
+- `fromPubkey: Pubkey` — Funding account public key (signer, writable)
+- `toPubkey: Pubkey` — New account public key (signer, writable)
+- `lamports: bigint` — Number of lamports to transfer to the new account
+- `space: bigint` — Number of bytes of memory to allocate
+- `owner: Pubkey` — Program that will own the new account
+
+**Example:**
+
+```typescript
+const ix = createAccount(funder, newAccount, 1000n, 128n, ownerProgramId);
+```
+
+---
+
+### `createAccountWithAnchor`
+
+Creates a new account and anchors it to a specific UTXO (e.g., for Bitcoin integration).
+
+**Parameters:**
+
+- `fromPubkey: Pubkey` — Funding account public key (signer, writable)
+- `toPubkey: Pubkey` — New account public key (signer, writable)
+- `lamports: bigint` — Number of lamports to transfer
+- `space: bigint` — Number of bytes of memory to allocate
+- `owner: Pubkey` — Program that will own the new account
+- `txid: string` — 64-character hex string of the UTXO transaction ID
+- `vout: number` — Output index of the UTXO
+
+**Example:**
+
+```typescript
+const ix = createAccountWithAnchor(
+  funder,
+  newAccount,
+  1000n,
+  128n,
+  ownerProgramId,
+  'aabbcc...ff', // 64-char hex string
+  0,
+);
+```
+
+---
+
+### `transfer`
+
+Transfers lamports from one account to another.
+
+**Parameters:**
+
+- `fromPubkey: Pubkey` — Sender account public key (signer, writable)
+- `toPubkey: Pubkey` — Recipient account public key (writable)
+- `lamports: bigint` — Amount to transfer
+
+**Example:**
+
+```typescript
+const ix = transfer(sender, recipient, 500n);
+```
+
+---
+
+### `assign`
+
+Assigns a new owner (program) to an account.
+
+**Parameters:**
+
+- `pubkey: Pubkey` — Account to reassign (signer, writable)
+- `owner: Pubkey` — New owner program public key
+
+**Example:**
+
+```typescript
+const ix = assign(account, newOwnerProgramId);
+```
+
+---
+
+### `allocate`
+
+Allocates space in an account without funding it.
+
+**Parameters:**
+
+- `pubkey: Pubkey` — Account to allocate space for (signer, writable)
+- `space: bigint` — Number of bytes to allocate
+
+**Example:**
+
+```typescript
+const ix = allocate(account, 256n);
+```
+
+---
+
+**Usage Note:**
+After constructing an instruction with these helpers, use the SDK's serialization utilities (see above) to serialize and send the instruction as part of a transaction.
+
 ## Example: Creating and Sending a Transaction
 
 ```typescript
