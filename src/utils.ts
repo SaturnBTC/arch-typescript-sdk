@@ -1,3 +1,5 @@
+import { serializeWithUint8Array } from './serde/uint8array';
+
 type Value = { [key: string]: any };
 
 export interface JsonRpcPayload<T> {
@@ -24,7 +26,11 @@ export async function postData<T>(
 
   let serializedPayload;
   try {
-    serializedPayload = JSON.stringify(payload);
+    // Serialize Uint8Array fields to number arrays before JSON stringification
+    const serializedPayloadObj = serializeWithUint8Array(payload);
+    serializedPayload = JSON.stringify(serializedPayloadObj);
+    console.log('🔍 DEBUG: Serialized payload length:', serializedPayload.length);
+    console.log('🔍 DEBUG: Serialized payload preview:', serializedPayload.substring(0, 200) + '...');
   } catch (err) {
     throw Error('payload must be serializable', { cause: err });
   }
