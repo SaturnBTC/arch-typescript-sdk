@@ -41,3 +41,37 @@ export type {
 } from './struct/processed-transaction';
 export * as SignatureUtil from './signatures';
 export { ArchRpcError } from './utils';
+
+// Token exports
+export type {
+  TokenMint,
+  TokenAccount,
+  CreateTokenMintParams,
+  CreateTokenAccountParams,
+  MintTokensParams,
+  TransferTokensParams,
+  TokenInstruction,
+  TokenAccountMeta,
+  TokenInstructionType,
+  // Advanced Operations
+  TransferCheckedParams,
+  MintToCheckedParams,
+  BurnCheckedParams,
+  ApproveCheckedParams,
+  // Authority Management
+  SetAuthorityParams,
+  AuthorityType,
+  // Delegation
+  ApproveParams,
+  RevokeParams,
+  // Multisig
+  CreateMultisigParams,
+  MultisigAccount,
+  // Batch Operations
+  BatchTransferParams,
+  BatchMintParams,
+  // Account Management
+  CloseAccountParams
+} from './struct/token';
+export { APL_TOKEN_PROGRAM_ID } from './struct/token';
+export { TokenUtil } from './serde/token';
