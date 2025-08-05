@@ -6,6 +6,10 @@ import { Pubkey } from '../struct/pubkey';
 import { RuntimeTransaction } from '../struct/runtime-transaction';
 import { ProgramAccount, AccountFilter } from '../struct/program-account';
 import { ArchRpcError, postData, processResult } from '../utils';
+import { BlockTransactionFilter } from '../struct/block-transaction-filter';
+import { BlockTransactionsParams } from '../struct/block-transactions-params';
+import { TransactionsByIdsParams } from '../struct/transactions-by-ids-params';
+import { TransactionListParams } from '../struct/transaction-list-params';
 
 import {
   deserializeWithUint8Array,
@@ -221,5 +225,95 @@ export class RpcConnection implements Provider {
         serializeWithUint8Array(pubkey),
       ),
     );
+  }
+
+  /**
+   * Gets a block by its height.
+   * @param blockHeight The block height.
+   * @param filter Optional filter for block transactions.
+   * @returns A promise that resolves with the block or undefined if not found.
+   */
+  async getBlockByHeight(
+    blockHeight: number,
+    filter?: BlockTransactionFilter,
+  ): Promise<Block | undefined> {
+    try {
+      const params = filter ? [blockHeight, filter] : [blockHeight, null];
+      const blockData = await postData(
+        this.nodeUrl,
+        Action.GET_BLOCK_BY_HEIGHT,
+        params,
+      );
+      return processResult<Block>(blockData);
+    } catch (error: any) {
+      if (error instanceof ArchRpcError && error.error.code === NOT_FOUND) {
+        return undefined;
+      }
+      throw error;
+    }
+  }
+
+  /**
+   * Gets all transactions for a given block.
+   * @param params BlockTransactionsParams object.
+   * @returns A promise that resolves with an array of processed transactions.
+   */
+  async getTransactionsByBlock(
+    params: BlockTransactionsParams,
+  ): Promise<ProcessedTransaction[]> {
+    const result = await postData(
+      this.nodeUrl,
+      Action.GET_TRANSACTIONS_BY_BLOCK,
+      serializeWithUint8Array(params),
+    );
+    return processResult<ProcessedTransaction[]>(result);
+  }
+
+  /**
+   * Gets transactions by a list of transaction IDs.
+   * @param params TransactionsByIdsParams object.
+   * @returns A promise that resolves with an array of processed transactions or null for missing ones.
+   */
+  async getTransactionsByIds(
+    params: TransactionsByIdsParams,
+  ): Promise<(ProcessedTransaction | null)[]> {
+    const result = await postData(
+      this.nodeUrl,
+      Action.GET_TRANSACTIONS_BY_IDS,
+      params,
+    );
+    return processResult<(ProcessedTransaction | null)[]>(result);
+  }
+
+  /**
+   * Gets a list of recent transactions, with optional filtering.
+   * @param params TransactionListParams object.
+   * @returns A promise that resolves with an array of processed transactions.
+   */
+  async recentTransactions(
+    params: TransactionListParams,
+  ): Promise<ProcessedTransaction[]> {
+    const result = await postData(
+      this.nodeUrl,
+      Action.RECENT_TRANSACTIONS,
+      serializeWithUint8Array(params),
+    );
+    return processResult<ProcessedTransaction[]>(result);
+  }
+
+  /**
+   * Gets multiple accounts by their public keys.
+   * @param pubkeys Array of public keys.
+   * @returns A promise that resolves with an array of AccountInfoResult or null for missing accounts.
+   */
+  async getMultipleAccounts(
+    pubkeys: Pubkey[],
+  ): Promise<(AccountInfoResult | null)[]> {
+    const result = await postData(
+      this.nodeUrl,
+      Action.GET_MULTIPLE_ACCOUNTS,
+      serializeWithUint8Array(pubkeys),
+    );
+    return processResult<(AccountInfoResult | null)[]>(result);
   }
 }
