@@ -41,3 +41,6 @@ export type {
 } from './struct/processed-transaction';
 export * as SignatureUtil from './signatures';
 export { ArchRpcError } from './utils';
+
+export * as SystemInstruction from './system-instructions/system-instructions';
+export * as ComputeBudget from './system-instructions/compute-budget';
