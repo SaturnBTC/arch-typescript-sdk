@@ -360,7 +360,7 @@ export class Maestro implements Provider {
     throw new Error('Not implemented');
   }
 
-  async createAccountWithFaucet(pubkey: Pubkey) {
+  async createAccountWithFaucet(pubkey: Pubkey): Promise<RuntimeTransaction> {
     // const response = await fetch(`${this.url}/rpc/account/faucet`, {
     //   method: 'POST',
     //   headers: this.commonHeaders(),

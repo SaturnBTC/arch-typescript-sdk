@@ -23,7 +23,7 @@ export interface Provider {
     txid: string,
   ) => Promise<ProcessedTransaction | undefined>;
   requestAirdrop: (pubkey: Pubkey) => Promise<void>;
-  createAccountWithFaucet: (pubkey: Pubkey) => Promise<void>;
+  createAccountWithFaucet: (pubkey: Pubkey) => Promise<RuntimeTransaction>;
   getBlockByHeight: (
     blockHeight: number,
     filter?: BlockTransactionFilter,

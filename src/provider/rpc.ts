@@ -215,10 +215,10 @@ export class RpcConnection implements Provider {
   /**
    * Creates an account with a faucet for a given public key.
    * @param pubkey The public key to create an account with a faucet for.
-   * @returns A promise that resolves with the account creation result.
+   * @returns A promise that resolves with the account creation transaction. You need to send this transaction to the network.
    */
-  async createAccountWithFaucet(pubkey: Pubkey) {
-    return processResult<void>(
+  async createAccountWithFaucet(pubkey: Pubkey): Promise<RuntimeTransaction> {
+    return processResult<RuntimeTransaction>(
       await postData(
         this.nodeUrl,
         Action.CREATE_ACCOUNT_WITH_FAUCET,
