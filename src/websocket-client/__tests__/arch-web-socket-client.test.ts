@@ -2,49 +2,40 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ArchWebSocketClient } from '../arch-web-socket-client';
 import { EventTopic } from '../types/events';
 import type { ArchEventCallback } from '../managers/event-manager';
+import { SocketLike } from '../managers/socket-like';
 
-vi.mock('socket.io-client', () => {
-  // MockSocket simulates the Socket.IO client used by ArchWebSocketClient.
-  // It allows us to control connection state and simulate server events/responses.
-  class MockSocket {
+// Mock the ConnectionManager to inject a fake SocketLike
+vi.mock('../managers/connection-manager', () => {
+  class MockSocket implements SocketLike {
     public handlers: Record<string, Set<Function>> = {};
     public connected = false;
-
-    // Simulate connecting to the server.
-    connect() {
-      // After a short delay, set connected=true and emit 'connect' event.
+    connect(): void {
       setTimeout(() => {
         this.connected = true;
-        (this.handlers['connect'] || []).forEach((callback) => callback());
+        (this.handlers['connect'] || new Set()).forEach((cb) => cb());
       }, 0);
     }
-
-    // Simulate disconnecting from the server.
-    disconnect() {
+    disconnect(): void {
       this.connected = false;
-      (this.handlers['disconnect'] || []).forEach((callback) => callback());
+      (this.handlers['disconnect'] || new Set()).forEach((cb) => cb());
     }
-
-    // Register an event handler (e.g., for 'block', 'connect', etc.)
-    on(event: string, callback: Function) {
+    on(event: string, callback: Function): void {
       if (!this.handlers[event]) this.handlers[event] = new Set();
       this.handlers[event].add(callback);
     }
-
-    // Remove a specific event handler.
-    off(event: string, callback: Function) {
-      if (this.handlers[event]) this.handlers[event].delete(callback);
+    off(event: string, callback: Function): void {
+      this.handlers[event]?.delete(callback);
     }
-
-    // Emit an event to all registered handlers.
-    // Also simulates server-side responses for 'subscribe'.
-    emit(event: string, ...args: any[]) {
-      (this.handlers[event] || []).forEach((callback) => callback(...args));
-      /*
-        Simulate the server's response to a 'subscribe' event:
-        When the client emits 'subscribe', the server would normally reply
-        with a 'subscription_response_{requestId}' event. We simulate that here.
-      */
+    once(event: string, callback: Function): void {
+      const wrapper = (...args: any[]) => {
+        callback(...args);
+        this.off(event, wrapper);
+      };
+      this.on(event, wrapper);
+    }
+    emit(event: string, ...args: any[]): void {
+      // echo locally and simulate server behavior for subscribe
+      (this.handlers[event] || new Set()).forEach((cb) => cb(...args));
       if (event === 'subscribe') {
         const request = args[0];
         setTimeout(() => {
@@ -53,26 +44,22 @@ vi.mock('socket.io-client', () => {
             status: 'Subscribed',
             subscriptionId: `sub-${request.topic}-${request.request_id}`,
           };
-          (
-            this.handlers[`subscription_response_${request.request_id}`] || []
-          ).forEach((callback) => callback(response));
+          (this.handlers[`subscription_response_${request.request_id}`] || new Set()).forEach((cb) => cb(response));
         }, 0);
       }
     }
-
-    once(event: string, callback: Function) {
-      const wrapper = (...args: any[]) => {
-        callback(...args);
-        this.off(event, wrapper);
-      };
-      this.on(event, wrapper);
-    }
   }
-  // Return the mock for socket.io-client
-  return {
-    io: vi.fn(() => new MockSocket()),
-    Socket: MockSocket,
-  };
+  class MockConnectionManager {
+    private socket = new MockSocket();
+    async connect() { this.socket.connect(); await new Promise((r) => setTimeout(r, 0)); }
+    async disconnect() { this.socket.disconnect(); }
+    isConnected() { return this.socket.connected; }
+    getSocket() { return this.socket; }
+    onConnect() { return () => {}; }
+    onDisconnect() { return () => {}; }
+    enableKeepAlive() {}
+  }
+  return { ConnectionManager: MockConnectionManager };
 });
 
 describe('ArchWebSocketClient', () => {

@@ -54,23 +54,22 @@ export type {
   TransactionFilter,
   BlockFilter,
 } from './websocket-client/types/filters';
+export { EventTopic, TransactionStatus } from './websocket-client/types/events';
 export type {
   ArchSocketEvent,
-  TransactionStatus,
   AccountUpdateEvent,
   RolledbackTransactionsEvent,
   ReappliedTransactionsEvent,
   DKGEvent,
   BlockEvent,
   TransactionEvent,
-  EventTopic,
 } from './websocket-client/types/events';
 export type {
   SubscribeRequest,
   SubscriptionResponse,
   UnsubscribeRequest,
   UnsubscribeResponse,
-  SubscriptionStatus,
 } from './websocket-client/types/messages';
+export { SubscriptionStatus } from './websocket-client/types/messages';
 export type { WebSocketError } from './websocket-client/errors/web-socket-error';
-export type { WebSocketErrorType } from './websocket-client/errors/web-socket-error';
+export { WebSocketErrorType } from './websocket-client/errors/web-socket-error';

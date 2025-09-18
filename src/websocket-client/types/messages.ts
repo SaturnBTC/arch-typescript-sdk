@@ -9,7 +9,7 @@ export interface SubscribeRequest {
 
 export interface UnsubscribeRequest {
   topic: EventTopic;
-  subscriptionId: string;
+  subscription_id: string;
 }
 
 export enum SubscriptionStatus {
@@ -20,13 +20,13 @@ export enum SubscriptionStatus {
 
 export interface SubscriptionResponse {
   status: SubscriptionStatus;
-  subscriptionId: string;
+  subscription_id: string;
   topic: EventTopic;
   request_id?: string;
 }
 
 export interface UnsubscribeResponse {
   status: SubscriptionStatus;
-  subscriptionId: string;
+  subscription_id: string;
   message: string;
 }

@@ -1,4 +1,5 @@
-import { io, Socket } from 'socket.io-client';
+import { SocketLike } from './socket-like';
+import { WebSocketAdapter } from './ws-adapter';
 import {
   DEFAULT_OPTIONS,
   WebSocketClientOptions,
@@ -6,7 +7,7 @@ import {
 import { WebSocketError, WebSocketErrorType } from '../errors/web-socket-error';
 
 export class ConnectionManager {
-  private socket: Socket | null = null;
+  private socket: SocketLike | null = null;
   private connectCallbacks: Set<() => void> = new Set();
   private disconnectCallbacks: Set<() => void> = new Set();
   private options: WebSocketClientOptions;
@@ -46,15 +47,7 @@ export class ConnectionManager {
     this.isConnecting = true;
 
     try {
-      // Create Socket.IO connection
-      this.socket = io(this.options.url, {
-        transports: this.options.transports ?? DEFAULT_OPTIONS.transports,
-        timeout: this.options.timeout ?? DEFAULT_OPTIONS.timeout,
-        forceNew: this.options.forceNew ?? DEFAULT_OPTIONS.forceNew,
-        multiplex: this.options.multiplex ?? DEFAULT_OPTIONS.multiplex,
-        autoConnect: false, // We'll connect manually
-        reconnection: false, // We'll handle reconnection ourselves
-      });
+      this.socket = new WebSocketAdapter(this.options.url);
 
       // Set up event listeners
       this.setupEventListeners();
@@ -80,22 +73,14 @@ export class ConnectionManager {
           );
         }, this.options.timeout || DEFAULT_OPTIONS.timeout);
 
-        this.socket.once('connect', () => {
+        this.socket!.once('connect', () => {
           clearTimeout(timeout);
           this.isConnecting = false;
           resolve();
         });
 
-        this.socket.once('connect_error', (error) => {
-          clearTimeout(timeout);
-          this.isConnecting = false;
-          reject(
-            new WebSocketError(
-              WebSocketErrorType.ConnectionFailed,
-              error.message,
-            ),
-          );
-        });
+        // For plain WS we don't have a separate 'connect_error' upfront.
+        // We'll treat timeout as connection failure.
 
         this.socket.connect();
       });
@@ -121,7 +106,7 @@ export class ConnectionManager {
     return this.socket?.connected || false;
   }
 
-  getSocket(): Socket | null {
+  getSocket(): SocketLike | null {
     return this.socket;
   }
 
@@ -177,11 +162,7 @@ export class ConnectionManager {
         }
       });
     });
-
-    this.socket.on('connect_error', (error) => {
-      console.error('Connection error:', error);
-    });
-
+    
     this.socket.on('error', (error) => {
       console.error('Socket error:', error);
     });

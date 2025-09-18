@@ -1,4 +1,4 @@
-import { Socket } from 'socket.io-client';
+import { SocketLike } from './socket-like';
 import { WebSocketError, WebSocketErrorType } from '../errors/web-socket-error';
 import { EventTopic } from '../types/events';
 import { EventFilter } from '../types/filters';
@@ -18,10 +18,10 @@ interface SubscriptionHandler {
 
 export class SubscriptionManager {
   private subscriptions: Map<string, SubscriptionHandler> = new Map();
-  private socket: Socket | null = null;
+  private socket: SocketLike | null = null;
   private requestIdCounter: number = 0;
 
-  setSocket(socket: Socket): void {
+  setSocket(socket: SocketLike): void {
     this.socket = socket;
     this.setupMessageHandlers();
   }
@@ -85,13 +85,13 @@ export class SubscriptionManager {
           if (response.status === 'Subscribed') {
             // Update subscription with confirmed ID
             this.subscriptions.delete(pendingId);
-            this.subscriptions.set(response.subscriptionId, {
-              id: response.subscriptionId,
+            this.subscriptions.set(response.subscription_id, {
+              id: response.subscription_id,
               topic,
               filter,
               pending: false,
             });
-            resolve(response.subscriptionId);
+            resolve(response.subscription_id);
           } else {
             this.subscriptions.delete(pendingId);
             reject(
@@ -105,9 +105,9 @@ export class SubscriptionManager {
       };
 
       // Store response handler temporarily
-      (this.socket as any).once(
-        `subscription_response_${requestId}`,
-        responseHandler,
+      this.socket!.once(
+        `subscription_response_${requestId}` as any,
+        responseHandler as any,
       );
 
       // Send the request
@@ -133,7 +133,7 @@ export class SubscriptionManager {
 
     const request: UnsubscribeRequest = {
       topic: subscription.topic,
-      subscriptionId,
+      subscription_id: subscriptionId,
     };
 
     return new Promise<void>((resolve, reject) => {
@@ -147,16 +147,16 @@ export class SubscriptionManager {
       }, 10000);
 
       const responseHandler = (response: UnsubscribeResponse) => {
-        if (response.subscriptionId === subscriptionId) {
+        if (response.subscription_id === subscriptionId) {
           clearTimeout(timeout);
           this.subscriptions.delete(subscriptionId);
           resolve();
         }
       };
 
-      (this.socket as any).once(
-        `unsubscribe_response_${subscriptionId}`,
-        responseHandler,
+      this.socket!.once(
+        `unsubscribe_response_${subscriptionId}` as any,
+        responseHandler as any,
       );
       this.socket!.emit('unsubscribe', request);
     });
@@ -224,7 +224,7 @@ export class SubscriptionManager {
 
     this.socket.on('unsubscribe_response', (response: UnsubscribeResponse) => {
       this.socket!.emit(
-        `unsubscribe_response_${response.subscriptionId}`,
+        `unsubscribe_response_${response.subscription_id}`,
         response,
       );
     });
