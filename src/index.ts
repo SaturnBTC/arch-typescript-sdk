@@ -44,3 +44,33 @@ export { ArchRpcError } from './utils';
 
 export * as SystemInstruction from './system-instructions/system-instructions';
 export * as ComputeBudget from './system-instructions/compute-budget';
+
+// websocket
+export { ArchWebSocketClient } from './websocket-client/arch-web-socket-client';
+export type { WebSocketClientOptions } from './websocket-client/config/web-socket-config';
+export type { BackoffStrategy } from './websocket-client/config/backoff-strategy';
+export type {
+  EventFilter,
+  TransactionFilter,
+  BlockFilter,
+} from './websocket-client/types/filters';
+export type {
+  ArchSocketEvent,
+  TransactionStatus,
+  AccountUpdateEvent,
+  RolledbackTransactionsEvent,
+  ReappliedTransactionsEvent,
+  DKGEvent,
+  BlockEvent,
+  TransactionEvent,
+  EventTopic,
+} from './websocket-client/types/events';
+export type {
+  SubscribeRequest,
+  SubscriptionResponse,
+  UnsubscribeRequest,
+  UnsubscribeResponse,
+  SubscriptionStatus,
+} from './websocket-client/types/messages';
+export type { WebSocketError } from './websocket-client/errors/web-socket-error';
+export type { WebSocketErrorType } from './websocket-client/errors/web-socket-error';
