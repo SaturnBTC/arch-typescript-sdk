@@ -1,6 +1,6 @@
 {
   "name": "@saturnbtcio/arch-sdk",
-  "version": "0.0.18",
+  "version": "0.0.19",
   "description": "Arch SDK",
   "author": "Saturn BTC",
   "main": "dist/index.js",
