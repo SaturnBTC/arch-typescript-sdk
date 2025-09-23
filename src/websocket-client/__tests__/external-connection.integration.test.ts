@@ -1,4 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
+import WebSocket from 'ws';
 import { ArchWebSocketClient } from '../arch-web-socket-client';
 import { EventTopic } from '../types/events';
 
@@ -9,6 +10,7 @@ describe('External WebSocket connectivity', () => {
       url: 'ws://44.195.37.144:9003',
       timeout: 15000,
       autoReconnect: false,
+      webSocketFactory: (url: string) => new WebSocket(url),
     });
 
     await client.connect();
@@ -23,6 +25,7 @@ describe('External WebSocket connectivity', () => {
       url: 'ws://44.195.37.144:9003',
       timeout: 20000,
       autoReconnect: false,
+      webSocketFactory: (url: string) => new WebSocket(url),
     });
 
     await client.connect();
@@ -45,6 +48,7 @@ describe('External WebSocket connectivity', () => {
       url: 'ws://44.195.37.144:9003',
       timeout: 20000,
       autoReconnect: false,
+      webSocketFactory: (url: string) => new WebSocket(url),
     });
 
     await client.connect();
@@ -74,6 +78,7 @@ describe('External WebSocket connectivity', () => {
       url: 'ws://44.195.37.144:9003',
       timeout: 20000,
       autoReconnect: false,
+      webSocketFactory: (url: string) => new WebSocket(url),
     });
 
     await client.connect();

@@ -34,6 +34,7 @@ export class ArchWebSocketClient {
       transports: options.transports ?? DEFAULT_OPTIONS.transports,
       forceNew: options.forceNew ?? DEFAULT_OPTIONS.forceNew,
       multiplex: options.multiplex ?? DEFAULT_OPTIONS.multiplex,
+      webSocketFactory: options.webSocketFactory ?? DEFAULT_OPTIONS.webSocketFactory,
     };
 
     this.connectionManager = new ConnectionManager(this.options);
