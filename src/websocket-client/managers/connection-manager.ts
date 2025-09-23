@@ -12,7 +12,7 @@ export class ConnectionManager {
   private disconnectCallbacks: Set<() => void> = new Set();
   private options: WebSocketClientOptions;
   private isConnecting: boolean = false;
-  private keepAliveInterval: NodeJS.Timeout | null = null;
+  private keepAliveInterval: ReturnType<typeof setInterval> | null = null;
 
   constructor(options: WebSocketClientOptions) {
     this.options = options;
@@ -47,7 +47,7 @@ export class ConnectionManager {
     this.isConnecting = true;
 
     try {
-      this.socket = new WebSocketAdapter(this.options.url);
+      this.socket = new WebSocketAdapter(this.options.url, this.options.webSocketFactory);
 
       // Set up event listeners
       this.setupEventListeners();

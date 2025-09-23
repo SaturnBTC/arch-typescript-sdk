@@ -1,4 +1,5 @@
 import { BackoffStrategy } from './backoff-strategy';
+import { WebSocketFactory, defaultWebSocketFactory } from '../managers/websocket-factory';
 
 export interface WebSocketClientOptions {
   url: string;
@@ -9,6 +10,7 @@ export interface WebSocketClientOptions {
   transports?: string[];
   forceNew?: boolean;
   multiplex?: boolean;
+  webSocketFactory?: WebSocketFactory;
 }
 
 export const DEFAULT_OPTIONS: WebSocketClientOptions = {
@@ -19,4 +21,5 @@ export const DEFAULT_OPTIONS: WebSocketClientOptions = {
   forceNew: true,
   multiplex: false,
   url: '', // must be provided by user
+  webSocketFactory: defaultWebSocketFactory,
 };

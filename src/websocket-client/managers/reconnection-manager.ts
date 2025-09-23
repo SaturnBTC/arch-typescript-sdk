@@ -6,7 +6,7 @@ export class ReconnectionManager {
   private strategy: BackoffStrategy;
   private maxAttempts: number = 5;
   private currentAttempt: number = 0;
-  private reconnectTimer: NodeJS.Timeout | null = null;
+  private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(defaultStrategy: BackoffStrategy) {
     this.strategy = defaultStrategy;

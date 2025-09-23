@@ -1,16 +1,18 @@
-import WebSocket from 'ws';
 import { SocketLike } from './socket-like';
+import { WebSocketFactory } from './websocket-factory';
 
 type EventHandler = (...args: any[]) => void;
 
 export class WebSocketAdapter implements SocketLike {
   private url: string;
-  private ws: WebSocket | null = null;
+  private ws: any | null = null;
+  private factory?: WebSocketFactory;
   private handlers: Map<string, Set<EventHandler>> = new Map();
   public connected: boolean = false;
 
-  constructor(url: string) {
+  constructor(url: string, factory?: WebSocketFactory) {
     this.url = url;
+    this.factory = factory;
   }
 
   connect(): void {
@@ -21,27 +23,48 @@ export class WebSocketAdapter implements SocketLike {
     ) {
       return;
     }
-    this.ws = new WebSocket(this.url);
+    // Prefer injected factory (for Node/testing); otherwise try browser global
+    const globalWS = (typeof globalThis !== 'undefined'
+      ? (globalThis as any).WebSocket
+      : undefined) as any;
+    const created = this.factory
+      ? this.factory(this.url)
+      : globalWS
+      ? new globalWS(this.url)
+      : null;
 
-    this.ws.on('open', () => {
+    if (!created) {
+      this.emitLocal(
+        'error',
+        new Error(
+          'No WebSocket implementation available. Provide webSocketFactory in options when not running in a browser.',
+        ),
+      );
+      return;
+    }
+
+    this.ws = created;
+
+    // Attach event listeners for both browser and Node ws implementations
+    const socket: any = this.ws;
+
+    const onOpen = () => {
       this.connected = true;
       this.emitLocal('connect');
-    });
-
-    this.ws.on('close', () => {
+    };
+    const onClose = () => {
       const wasConnected = this.connected;
       this.connected = false;
       if (wasConnected) {
         this.emitLocal('disconnect');
       }
-    });
-
-    this.ws.on('error', (err: Error) => {
-      this.emitLocal('error', err);
-    });
-
-    this.ws.on('message', (raw: WebSocket.RawData) => {
+    };
+    const onError = (err: any) => {
+      this.emitLocal('error', err instanceof Error ? err : new Error(String(err)));
+    };
+    const onMessage = (evtOrRaw: any) => {
       try {
+        const raw = evtOrRaw && evtOrRaw.data !== undefined ? evtOrRaw.data : evtOrRaw;
         const text = typeof raw === 'string' ? raw : (raw as any)?.toString?.();
         if (!text) return;
         const msg = JSON.parse(text as string);
@@ -54,14 +77,12 @@ export class WebSocketAdapter implements SocketLike {
           'subscription_id' in msg
         ) {
           if (msg.topic !== undefined) {
-            // It's a SubscriptionResponse
             this.emitLocal('subscription_response', msg);
             if (msg.request_id) {
               this.emitLocal(`subscription_response_${msg.request_id}`, msg);
             }
             return;
           } else {
-            // It's an UnsubscribeResponse
             this.emitLocal('unsubscribe_response', msg);
             this.emitLocal(`unsubscribe_response_${msg.subscription_id}`, msg);
             return;
@@ -83,7 +104,19 @@ export class WebSocketAdapter implements SocketLike {
       } catch (e) {
         // Ignore malformed messages
       }
-    });
+    };
+
+    if (typeof socket.addEventListener === 'function') {
+      socket.addEventListener('open', onOpen);
+      socket.addEventListener('close', onClose);
+      socket.addEventListener('error', onError);
+      socket.addEventListener('message', onMessage);
+    } else if (typeof socket.on === 'function') {
+      socket.on('open', onOpen);
+      socket.on('close', onClose);
+      socket.on('error', onError);
+      socket.on('message', onMessage);
+    }
   }
 
   disconnect(): void {
@@ -116,7 +149,8 @@ export class WebSocketAdapter implements SocketLike {
   }
 
   emit(event: string, ...args: any[]): void {
-    if (!this.ws || this.ws.readyState !== WebSocket.OPEN) return;
+    // 1 === OPEN for both browser WebSocket and ws
+    if (!this.ws || (this.ws as any).readyState !== 1) return;
 
     // Internal re-dispatch events should not be sent over the wire
     if (
