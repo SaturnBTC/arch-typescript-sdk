@@ -21,20 +21,24 @@ export interface BlockEvent {
 export interface TransactionEvent {
   hash: string;
   status: TransactionStatus | { Failed: string };
-  programIds: string[];
+  program_ids: string[];
+  block_height: number;
 }
 
 export interface AccountUpdateEvent {
   account: string;
-  transactionHash: string;
+  transaction_hash: string;
+  block_height: number;
 }
 
 export interface RolledbackTransactionsEvent {
-  transactionHashes: string[];
+  transaction_hashes: string[];
+  block_height: number;
 }
 
 export interface ReappliedTransactionsEvent {
-  transactionHashes: string[];
+  transaction_hashes: string[];
+  block_height: number;
 }
 
 export interface DKGEvent {
