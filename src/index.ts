@@ -44,6 +44,7 @@ export { ArchRpcError } from './utils';
 
 export * as SystemInstruction from './system-instructions/system-instructions';
 export * as ComputeBudget from './system-instructions/compute-budget';
+export { minimumRent, isExempt } from './rent/rent';
 
 // websocket
 export { ArchWebSocketClient } from './websocket-client/arch-web-socket-client';
