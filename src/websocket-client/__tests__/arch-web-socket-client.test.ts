@@ -3,6 +3,7 @@ import { ArchWebSocketClient } from '../arch-web-socket-client';
 import { EventTopic } from '../types/events';
 import type { ArchEventCallback } from '../managers/event-manager';
 import { SocketLike } from '../managers/socket-like';
+import WebSocket from 'ws';
 
 // Mock the ConnectionManager to inject a fake SocketLike
 vi.mock('../managers/connection-manager', () => {
@@ -44,19 +45,35 @@ vi.mock('../managers/connection-manager', () => {
             status: 'Subscribed',
             subscriptionId: `sub-${request.topic}-${request.request_id}`,
           };
-          (this.handlers[`subscription_response_${request.request_id}`] || new Set()).forEach((cb) => cb(response));
+          (
+            this.handlers[`subscription_response_${request.request_id}`] ||
+            new Set()
+          ).forEach((cb) => cb(response));
         }, 0);
       }
     }
   }
   class MockConnectionManager {
     private socket = new MockSocket();
-    async connect() { this.socket.connect(); await new Promise((r) => setTimeout(r, 0)); }
-    async disconnect() { this.socket.disconnect(); }
-    isConnected() { return this.socket.connected; }
-    getSocket() { return this.socket; }
-    onConnect() { return () => {}; }
-    onDisconnect() { return () => {}; }
+    async connect() {
+      this.socket.connect();
+      await new Promise((r) => setTimeout(r, 0));
+    }
+    async disconnect() {
+      this.socket.disconnect();
+    }
+    isConnected() {
+      return this.socket.connected;
+    }
+    getSocket() {
+      return this.socket;
+    }
+    onConnect() {
+      return () => {};
+    }
+    onDisconnect() {
+      return () => {};
+    }
     enableKeepAlive() {}
   }
   return { ConnectionManager: MockConnectionManager };
@@ -66,7 +83,10 @@ describe('ArchWebSocketClient', () => {
   let client: ArchWebSocketClient;
 
   beforeEach(() => {
-    client = new ArchWebSocketClient({ url: 'ws://localhost:123' });
+    client = new ArchWebSocketClient({
+      url: 'ws://localhost:123',
+      webSocketFactory: (url: string) => new WebSocket(url),
+    });
   });
 
   it('Connects to the server', async () => {

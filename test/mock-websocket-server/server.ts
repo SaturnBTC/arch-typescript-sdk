@@ -1,11 +1,12 @@
 import { WebSocketServer, WebSocket } from 'ws';
 import http from 'http';
+import type { AddressInfo } from 'net';
 
 let wss: WebSocketServer | undefined;
 let httpServer: http.Server | undefined;
 let interval: NodeJS.Timeout | undefined;
 
-export async function startServer(port = 3001) {
+export async function startServer(port = 0): Promise<number> {
   httpServer = http.createServer();
   wss = new WebSocketServer({ server: httpServer });
 
@@ -16,29 +17,42 @@ export async function startServer(port = 3001) {
       try {
         const text = typeof raw === 'string' ? raw : raw.toString();
         const msg = JSON.parse(text);
-        if (msg.event === 'subscribe') {
-          const data = msg.data || {};
-          const subscriptionId = Math.random().toString(36).substring(2, 15);
+        // Support both old { event, data } and new { method, params } envelopes
+        const isSubscribe =
+          msg?.event === 'subscribe' || msg?.method === 'subscribe';
+        const isUnsubscribe =
+          msg?.event === 'unsubscribe' || msg?.method === 'unsubscribe';
+
+        if (isSubscribe) {
+          const data = msg?.data || msg?.params || {};
+          const subscription_id = Math.random().toString(36).substring(2, 15);
+          const request_id = data.request_id;
+          const topic = data.topic;
+
+          // Respond using the SDK-expected event channel and snake_case fields
           socket.send(
             JSON.stringify({
-              event: `subscription_response_${data.request_id}`,
+              event: `subscription_response_${request_id}`,
               data: {
                 status: 'Subscribed',
-                subscriptionId,
-                topic: data.topic,
-                request_id: data.request_id,
+                subscription_id,
+                topic,
+                request_id,
               },
             }),
           );
         }
-        if (msg.event === 'unsubscribe') {
-          const data = msg.data || {};
+
+        if (isUnsubscribe) {
+          const data = msg?.data || msg?.params || {};
+          const subscription_id = data.subscription_id || data.subscriptionId;
+
           socket.send(
             JSON.stringify({
-              event: `unsubscribe_response_${data.subscriptionId}`,
+              event: `unsubscribe_response_${subscription_id}`,
               data: {
                 status: 'Unsubscribed',
-                subscriptionId: data.subscriptionId,
+                subscription_id,
                 message: 'Unsubscribed successfully',
               },
             }),
@@ -76,12 +90,28 @@ export async function startServer(port = 3001) {
   }, 5000);
 
   await new Promise<void>((resolve) => httpServer!.listen(port, resolve));
-  console.log(`[SERVER] WS mock server started on port ${port}`);
+  const address = httpServer!.address();
+  const actualPort = typeof address === 'object' && address
+    ? (address as AddressInfo).port
+    : port;
+  console.log(`[SERVER] WS mock server started on port ${actualPort}`);
+  return actualPort;
 }
 
 export async function stopServer() {
   if (interval) clearInterval(interval);
-  if (wss) wss.close();
+  if (wss) {
+    try {
+      // Terminate all client sockets to ensure a clean shutdown
+      for (const client of wss.clients) {
+        try {
+          client.terminate();
+        } catch {}
+      }
+    } catch {}
+    await new Promise<void>((resolve) => wss!.close(() => resolve()));
+    wss = undefined;
+  }
   if (httpServer)
     await new Promise<void>((resolve) => httpServer!.close(() => resolve()));
   console.log('[SERVER] WS mock server stopped');

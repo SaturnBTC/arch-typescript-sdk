@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
+import WebSocket from 'ws';
 
 import { ArchWebSocketClient } from '../arch-web-socket-client';
 import { EventTopic } from '../types/events';
@@ -8,8 +9,9 @@ import {
 } from '../../../test/mock-websocket-server/server';
 
 describe('ArchWebSocketClient Integration', () => {
+  let port: number;
   beforeAll(async () => {
-    await startServer(3001);
+    port = await startServer(0);
   });
 
   afterAll(async () => {
@@ -17,7 +19,10 @@ describe('ArchWebSocketClient Integration', () => {
   });
 
   it('Should subscribe and receive block events', async () => {
-    const client = new ArchWebSocketClient({ url: 'ws://localhost:3001' });
+    const client = new ArchWebSocketClient({
+      url: `ws://localhost:${port}`,
+      webSocketFactory: (url: string) => new WebSocket(url),
+    });
     await client.connect();
     expect(client.isConnected()).toBe(true);
     const callback = vi.fn(async () => {});
