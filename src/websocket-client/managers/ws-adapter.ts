@@ -9,6 +9,7 @@ export class WebSocketAdapter implements SocketLike {
   private factory?: WebSocketFactory;
   private handlers: Map<string, Set<EventHandler>> = new Map();
   public connected: boolean = false;
+  private lastActivityAt: number = Date.now();
 
   constructor(url: string, factory?: WebSocketFactory) {
     this.url = url;
@@ -24,14 +25,16 @@ export class WebSocketAdapter implements SocketLike {
       return;
     }
     // Prefer injected factory (for Node/testing); otherwise try browser global
-    const globalWS = (typeof globalThis !== 'undefined'
-      ? (globalThis as any).WebSocket
-      : undefined) as any;
+    const globalWS = (
+      typeof globalThis !== 'undefined'
+        ? (globalThis as any).WebSocket
+        : undefined
+    ) as any;
     const created = this.factory
       ? this.factory(this.url)
       : globalWS
-      ? new globalWS(this.url)
-      : null;
+        ? new globalWS(this.url)
+        : null;
 
     if (!created) {
       this.emitLocal(
@@ -50,6 +53,7 @@ export class WebSocketAdapter implements SocketLike {
 
     const onOpen = () => {
       this.connected = true;
+      this.lastActivityAt = Date.now();
       this.emitLocal('connect');
     };
     const onClose = () => {
@@ -60,11 +64,16 @@ export class WebSocketAdapter implements SocketLike {
       }
     };
     const onError = (err: any) => {
-      this.emitLocal('error', err instanceof Error ? err : new Error(String(err)));
+      this.emitLocal(
+        'error',
+        err instanceof Error ? err : new Error(String(err)),
+      );
     };
     const onMessage = (evtOrRaw: any) => {
       try {
-        const raw = evtOrRaw && evtOrRaw.data !== undefined ? evtOrRaw.data : evtOrRaw;
+        this.lastActivityAt = Date.now();
+        const raw =
+          evtOrRaw && evtOrRaw.data !== undefined ? evtOrRaw.data : evtOrRaw;
         const text = typeof raw === 'string' ? raw : (raw as any)?.toString?.();
         if (!text) return;
         const msg = JSON.parse(text as string);
@@ -116,6 +125,13 @@ export class WebSocketAdapter implements SocketLike {
       socket.on('close', onClose);
       socket.on('error', onError);
       socket.on('message', onMessage);
+      // Node ws exposes a 'pong' event when a pong control frame is received
+      try {
+        socket.on('pong', () => {
+          this.lastActivityAt = Date.now();
+          this.emitLocal('pong');
+        });
+      } catch {}
     }
   }
 
@@ -164,6 +180,18 @@ export class WebSocketAdapter implements SocketLike {
     }
 
     // Map SDK high-level events to server protocol
+    if (event === 'ping') {
+      // In Node (ws), send a protocol-level ping frame if available.
+      // In browsers, client cannot send ping frames; do nothing.
+      const anyWs: any = this.ws as any;
+      if (typeof anyWs.ping === 'function') {
+        try {
+          anyWs.ping();
+        } catch {}
+      }
+      return;
+    }
+
     if (event === 'subscribe') {
       const params = args[0] || {};
       const payload = {
