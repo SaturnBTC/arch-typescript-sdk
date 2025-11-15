@@ -38,9 +38,13 @@ const message = SanitizedMessageUtil.createSanitizedMessage(
 
 // 4. Hash the message and sign it (using your signing method)
 const messageHash = SanitizedMessageUtil.hash(message); // Uint8Array
+
+// Decode it using utf-8
+const messageHashString = new TextDecoder().decode(messageHash);
+
 // Sign the message hash using your Bitcoin private key, producing a BIP322-compliant signature.
 // You can use a wallet or library that supports BIP322 signing.
-const signature = bip322Sign(privateKey, messageHash, addressType); // pseudocode
+const signature = bip322Sign(privateKey, messageHashString, addressType); // pseudocode
 
 // 5. Adjust the signature to the required format
 const adjustedSignature = SignatureUtil.adjustSignature(signature);
